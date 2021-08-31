@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +14,27 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class RequestHTTPController : ControllerBase
     {
-        // GET: api/<RequestHTTPController>
+        //GET: api/<RequestHTTPController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public Task<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            var client = new RestClient("https://api.twitter.com/1.1");
+            client.Authenticator = new HttpBasicAuthenticator("username", "password");
+
+            var request = new RestRequest("statuses/home_timeline.json", DataFormat.Json);
+
+            var response = client.Get(request);
+
+            if (response != null)
+            {
+                return "not";
+            }
+
+            else
+            {
+                return "not";
+            }
+
         }
 
         // GET api/<RequestHTTPController>/5
