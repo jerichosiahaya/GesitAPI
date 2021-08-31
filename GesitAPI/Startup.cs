@@ -107,6 +107,9 @@ namespace GesitAPI
 
             // Scope section
             services.AddScoped<IRha, RhaData>();
+            services.AddScoped<IRhaevidence, RhaevidenceData>();
+            services.AddScoped<ITindakLanjut, TindakLanjutData>();
+            services.AddScoped<INotification, NotificationData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -115,9 +118,12 @@ namespace GesitAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GesitAPI v1"));
+                //app.UseSwagger();
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GesitAPI v1"));
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GesitAPI v1"));
 
             app.UseHttpsRedirection();
 

@@ -14,7 +14,6 @@ namespace GesitAPI.Models
         }
 
         public int Id { get; set; }
-        public string UicLama { get; set; }
         public string DivisiBaru { get; set; }
         public string UicBaru { get; set; }
         public string NamaAudit { get; set; }
@@ -23,7 +22,8 @@ namespace GesitAPI.Models
         public string Masalah { get; set; }
         public string Pendapat { get; set; }
         public string Status { get; set; }
-        public DateTime JatuhTempo { get; set; }
+        public DateTime? JatuhTempo { get; set; }
+        public int? TahunTemuan { get; set; }
         public string Assign { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

@@ -1,8 +1,15 @@
-﻿using GesitAPI.Data;
+﻿using ExcelDataReader;
+using GesitAPI.Data;
+using GesitAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,14 +17,17 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RhaController : ControllerBase
     {
         private IWebHostEnvironment _hostingEnvironment;
         private IRha _rha;
-        public RhaController(IRha rha, IWebHostEnvironment hostingEnvironment)
+        private GesitDbContext _db;
+        public RhaController(GesitDbContext db, IRha rha, IWebHostEnvironment hostingEnvironment)
         {
+            _db = db;
             _rha = rha;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -28,7 +38,7 @@ namespace GesitAPI.Controllers
         {
             var results = await _rha.GetAll();
             var files = results.ToList();
-            return Ok(new { rha_count = files.Count(), data = files });
+            return Ok(new { count = files.Count(), data = files });
         }
 
         // GET api/<RhaController>/5
@@ -40,9 +50,81 @@ namespace GesitAPI.Controllers
         }
 
         // POST api/<RhaController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //}
+
+        [HttpPost(nameof(Upload))]
+        public async Task<IActionResult> Upload([Required] IFormFile file)
         {
+            var subDirectory = "UploadedFiles";
+            var subDirectory2 = "Rha";
+            var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
+            Directory.CreateDirectory(target);
+            var filePath = Path.Combine(target, file.FileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            using (var stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var conf = new ExcelDataSetConfiguration
+                    {
+                        UseColumnDataType = true,
+                        ConfigureDataTable = _ => new ExcelDataTableConfiguration
+                        {
+                            UseHeaderRow = true
+                        }
+                    };
+
+                    var result = reader.AsDataSet(conf);
+
+                    if (result != null)
+                    {
+                        try { 
+                            var obj = result.Tables[0];
+                            var sheetName = obj.TableName;
+                            var objCount = obj.Rows.Count;
+                        
+                            for (int i=0; i<objCount; i++)
+                            {
+                                var rha = new Rha(); // DI from Models
+                                rha.DivisiBaru = obj.Rows[i][0].ToString();
+                                rha.UicBaru = obj.Rows[i][1].ToString();
+                                rha.NamaAudit = obj.Rows[i][2].ToString();
+                                rha.Lokasi = obj.Rows[i][3].ToString();
+                                rha.Nomor = Convert.ToInt32(obj.Rows[i][4]);
+                                rha.Masalah = obj.Rows[i][5].ToString();
+                                rha.Pendapat = obj.Rows[i][6].ToString();
+                                rha.Status = obj.Rows[i][7].ToString();;
+                                rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][9]);
+                                rha.Assign = obj.Rows[i][10].ToString();
+                                _db.Rhas.Add(rha);
+                            }
+                            await _db.SaveChangesAsync();
+                            return Ok(new { status = true, count = objCount, sheet_name = sheetName, data = obj });
+                        }
+                        catch (DbUpdateException dbEx)
+                        {
+                            throw new Exception(dbEx.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
         }
 
         // PUT api/<RhaController>/5

@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ExcelReaderController : ControllerBase
@@ -61,7 +63,8 @@ namespace GesitAPI.Controllers
                         var objCount = obj.Rows.Count;
                         //var obj = System.Text.Json.JsonSerializer.Serialize(result.Tables);
                         //JObject jsonResult = JObject.Parse(json);
-                        return Ok(new { status = true, count = objCount, sheet_name = sheetName, data = obj });
+                        //var tableList = obj.ToList();
+                        return Ok(new { status = true, count = objCount, sheet_name = sheetName, data = obj.Rows });
                     }
                     else
                     {

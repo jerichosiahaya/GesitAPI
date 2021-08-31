@@ -153,7 +153,7 @@ namespace GesitAPI.Models
 
                 entity.Property(e => e.ProjectTitle)
                     .IsRequired()
-                    .HasMaxLength(150)
+                    .HasColumnType("text")
                     .HasColumnName("project_title");
 
                 entity.Property(e => e.Status).HasColumnName("status");
@@ -217,15 +217,12 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("status");
 
+                entity.Property(e => e.TahunTemuan).HasColumnName("tahun_temuan");
+
                 entity.Property(e => e.UicBaru)
                     .IsRequired()
                     .HasMaxLength(25)
                     .HasColumnName("uic_baru");
-
-                entity.Property(e => e.UicLama)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("uic_lama");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")

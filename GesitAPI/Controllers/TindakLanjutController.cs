@@ -21,42 +21,39 @@ namespace GesitAPI.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class RhaEvidenceController : ControllerBase
+    public class TindakLanjutController : ControllerBase
     {
         private IWebHostEnvironment _hostingEnvironment;
-        private IRhaevidence _rhaEvidence;
-        public RhaEvidenceController(IRhaevidence rhaEvidence, IWebHostEnvironment hostingEnvironment)
+        private ITindakLanjut _tindakLanjut;
+        public TindakLanjutController(ITindakLanjut tindakLanjut, IWebHostEnvironment hostingEnvironment)
         {
-            _rhaEvidence = rhaEvidence;
+            _tindakLanjut = tindakLanjut;
             _hostingEnvironment = hostingEnvironment;
         }
 
         List<string> allowedFileExtensions = new List<string>() { "jpg", "png", "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt", "zip", "rar" };
-
-        // GET: api/<RhaEvidenceController>
+        // GET: api/<TindakLanjutController>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var results = await _rhaEvidence.GetAll();
+            var results = await _tindakLanjut.GetAll();
             var files = results.ToList();
             return Ok(new { count = files.Count(), data = files });
         }
 
-        // GET api/<RhaEvidenceController>/5
+        // GET api/<TindakLanjutController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var results = await _rhaEvidence.GetById(id);
+            var results = await _tindakLanjut.GetById(id);
             return Ok(new { data = results });
         }
 
-        
-
         [HttpPost(nameof(Upload))]
-        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] Rhaevidence rhaEvidence)
+        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] TindakLanjut tindakLanjut)
         {
             var subDirectory1 = "UploadedFiles";
-            var subDirectory2 = "RhaEvidence";
+            var subDirectory2 = "TindakLanjut";
             var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory1, subDirectory2);
             Directory.CreateDirectory(target);
             try
@@ -78,12 +75,12 @@ namespace GesitAPI.Controllers
                     return BadRequest(new { status = "Error", message = $"File with extension {rhs} is not allowed", logtime = DateTime.Now });
                 }
                 var filePath = Path.Combine(target, file.FileName);
-                rhaEvidence.FileType = file.ContentType;
-                rhaEvidence.FileSize = file.Length;
+                tindakLanjut.FileType = file.ContentType;
+                tindakLanjut.FileSize = file.Length;
                 if (System.IO.File.Exists(filePath))
                 {
                     // query for duplicate names to generate counter
-                    var duplicateNames = await _rhaEvidence.CountExistingFileNameRhaEvidence(lhs); // using DI from data access layer
+                    var duplicateNames = await _tindakLanjut.CountExistingFileNameTindakLanjut(lhs); // using DI from data access layer
                     var countDuplicateNames = duplicateNames.Count();
                     var value = countDuplicateNames + 1;
 
@@ -99,24 +96,24 @@ namespace GesitAPI.Controllers
                     // generating new file name
                     var newfileName = String.Format("{0}({1}){2}", Path.GetFileNameWithoutExtension(filePath), value, Path.GetExtension(filePath));
                     var newFilePath = Path.Combine(target, newfileName);
-                    rhaEvidence.FileName = newfileName;
-                    rhaEvidence.FilePath = newFilePath;
+                    tindakLanjut.FileName = newfileName;
+                    tindakLanjut.FilePath = newFilePath;
 
                     using (var stream = new FileStream(newFilePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                        await _rhaEvidence.Insert(rhaEvidence);
+                        await _tindakLanjut.Insert(tindakLanjut);
                     }
                     return Ok(new { status = "Success", message = "File successfully uploaded", file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
                 else
                 {
-                    rhaEvidence.FileName = file.FileName;
-                    rhaEvidence.FilePath = filePath;
+                    tindakLanjut.FileName = file.FileName;
+                    tindakLanjut.FilePath = filePath;
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                        await _rhaEvidence.Insert(rhaEvidence);
+                        await _tindakLanjut.Insert(tindakLanjut);
                     }
                     return Ok(new { status = "Success", message = "File successfully uploaded", file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
                 }
@@ -134,7 +131,7 @@ namespace GesitAPI.Controllers
         [HttpGet("Download/{id}")]
         public async Task<IActionResult> DownloadSingleFile(int id)
         {
-            var results = await _rhaEvidence.GetById(id.ToString());
+            var results = await _tindakLanjut.GetById(id.ToString());
             if (results == null)
                 return BadRequest(new { status = "Error", message = "There is no such a file" });
 
@@ -159,7 +156,7 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> GetBundleFiles(string rhaId)
         {
             List<byte[]> filesPath = new List<byte[]>();
-            var results = await _rhaEvidence.GetByRhaID(rhaId);
+            var results = await _tindakLanjut.GetByRhaID(rhaId);
             var files = results.ToList();
             if (files.Count == 0)
                 return Ok(new { status = "null", message = "Empty data" });
@@ -196,20 +193,19 @@ namespace GesitAPI.Controllers
             }
         }
 
-        // POST api/<RhaEvidenceController>
+        // POST api/<TindakLanjutController>
         //[HttpPost]
         //public void Post([FromBody] string value)
         //{
         //}
 
-        //// PUT api/<RhaEvidenceController>/5
+        // PUT api/<TindakLanjutController>/5
         //[HttpPut("{id}")]
         //public void Put(int id, [FromBody] string value)
         //{
         //}
 
-        // TBC
-        //// DELETE api/<RhaEvidenceController>/5
+        // DELETE api/<TindakLanjutController>/5
         //[HttpDelete("{id}")]
         //public void Delete(int id)
         //{

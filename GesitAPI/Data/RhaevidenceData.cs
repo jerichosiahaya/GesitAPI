@@ -39,6 +39,12 @@ namespace GesitAPI.Data
             return result;
         }
 
+        public async Task<IEnumerable<Rhaevidence>> GetByRhaID(string idRha)
+        {
+            var result = await _db.Rhaevidences.OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
+            return result;
+        }
+
         public async Task Insert(Rhaevidence obj)
         {
             try

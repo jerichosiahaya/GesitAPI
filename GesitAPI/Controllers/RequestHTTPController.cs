@@ -25,8 +25,7 @@ namespace GesitAPI.Controllers
             if (response == null)
             {
                 return NotFound();
-            } else
-            {
+            } else {
                 return Ok();
             }
 
