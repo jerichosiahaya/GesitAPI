@@ -1,9 +1,12 @@
+using GesitAPI.Data;
 using GesitAPI.Helpers;
+using GesitAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,6 +51,8 @@ namespace GesitAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GesitAPI", Version = "v1" });
             });
+
+            services.AddDbContext<GesitDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ServerConnection")));
 
             // Authorization features on Swagger section
             services.AddSwaggerGen(swagger =>
@@ -100,6 +105,8 @@ namespace GesitAPI
                 };
             });
 
+            // Scope section
+            services.AddScoped<IRha, RhaData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

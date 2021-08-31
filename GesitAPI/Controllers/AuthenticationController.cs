@@ -1,4 +1,5 @@
 ﻿using GesitAPI.Helpers;
+using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -21,19 +22,6 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        // TODO
-        // move to Models folder
-        public class User
-        {
-            public int id { get; set; }
-            public string npp { get; set; }
-            public string email { get; set; }
-            public string name { get; set; }
-            public string role { get; set; }
-            [JsonIgnore]
-            public string password { get; set; }
-        }
-
         private readonly AppSettings _appSettings;
         public AuthenticationController(IOptions<AppSettings> appSettings)
         {
