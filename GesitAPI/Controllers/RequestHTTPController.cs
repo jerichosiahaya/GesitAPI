@@ -16,23 +16,18 @@ namespace GesitAPI.Controllers
     {
         //GET: api/<RequestHTTPController>
         [HttpGet]
-        public Task<string> Get()
+        public IActionResult Get()
         {
-            var client = new RestClient("https://api.twitter.com/1.1");
-            client.Authenticator = new HttpBasicAuthenticator("username", "password");
-
+            var client = new RestClient("https://jsonplaceholder.typicode.com/todos/1");
+            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
             var request = new RestRequest("statuses/home_timeline.json", DataFormat.Json);
-
             var response = client.Get(request);
-
-            if (response != null)
+            if (response == null)
             {
-                return "not";
-            }
-
-            else
+                return NotFound();
+            } else
             {
-                return "not";
+                return Ok();
             }
 
         }

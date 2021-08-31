@@ -34,7 +34,6 @@ namespace GesitAPI.Controllers
         {
             return "value";
         }
-
         // POST api/<RhaEvidenceController>
         [HttpPost]
         public void Post([FromBody] string value)
