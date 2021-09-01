@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Data
 {
-    public class RhaData : IRha
+    public class SubRhaEvidenceData : ISubRhaEvidence
     {
-        private GesitDbContext _db;
-        public RhaData(GesitDbContext db)
+        GesitDbContext _db;
+        public SubRhaEvidenceData(GesitDbContext db)
         {
             _db = db;
         }
-
-        public async Task<IEnumerable<Rha>> CountExistingFileNameRha(string filename)
+        public async Task<IEnumerable<SubRhaevidence>> CountExistingFileNameSubRhaEvidence(string filename)
         {
-            var result = await _db.Rhas.Where(s => s.FileName.Contains(filename)).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhaevidences.Where(s => s.FileName.Contains(filename)).AsNoTracking().ToListAsync();
             return result;
         }
 
@@ -27,24 +26,23 @@ namespace GesitAPI.Data
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Rha>> GetAll()
+        public async Task<IEnumerable<SubRhaevidence>> GetAll()
         {
-            var result = await _db.Rhas.Include(e => e.SubRhas).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
-            // ThenInclude(c => c.InputTlfilesEvidences). kalau mau tambah tindak lanjut evidences
+            var result = await _db.SubRhaevidences.OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
             return result;
         }
 
-        public async Task<Rha> GetById(string id)
+        public async Task<SubRhaevidence> GetById(string id)
         {
-            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            var result = await _db.SubRhaevidences.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
             return result;
         }
 
-        public async Task Insert(Rha obj)
+        public async Task Insert(SubRhaevidence obj)
         {
             try
             {
-                _db.Rhas.Add(obj);
+                _db.SubRhaevidences.Add(obj);
                 await _db.SaveChangesAsync();
             }
             catch (DbUpdateException dbEx)
@@ -58,7 +56,7 @@ namespace GesitAPI.Data
         }
 
         // TBC
-        public Task Update(string id, Rha obj)
+        public Task Update(string id, SubRhaevidence obj)
         {
             throw new NotImplementedException();
         }

@@ -17,13 +17,10 @@ namespace GesitAPI.Models
         {
         }
 
-        public virtual DbSet<InputTlfile> InputTlfiles { get; set; }
-        public virtual DbSet<InputTlfilesEvidence> InputTlfilesEvidences { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Rha> Rhas { get; set; }
-        public virtual DbSet<Rhaevidence> Rhaevidences { get; set; }
-        public virtual DbSet<Rhafile> Rhafiles { get; set; }
-        public virtual DbSet<RhafilesEvidence> RhafilesEvidences { get; set; }
+        public virtual DbSet<SubRha> SubRhas { get; set; }
+        public virtual DbSet<SubRhaevidence> SubRhaevidences { get; set; }
         public virtual DbSet<TindakLanjut> TindakLanjuts { get; set; }
 
 //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -38,88 +35,6 @@ namespace GesitAPI.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<InputTlfile>(entity =>
-            {
-                entity.ToTable("InputTLFiles");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.FileName)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_name");
-
-                entity.Property(e => e.FilePath)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_path");
-
-                entity.Property(e => e.FileSize).HasColumnName("file_size");
-
-                entity.Property(e => e.FileType)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_type");
-
-                entity.Property(e => e.Notes)
-                    .HasColumnType("text")
-                    .HasColumnName("notes");
-
-                entity.Property(e => e.RhafilesId).HasColumnName("rhafiles_id");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-
-                entity.HasOne(d => d.Rhafiles)
-                    .WithMany(p => p.InputTlfiles)
-                    .HasForeignKey(d => d.RhafilesId)
-                    .HasConstraintName("FK__InputTLFi__rhafi__46E78A0C");
-            });
-
-            modelBuilder.Entity<InputTlfilesEvidence>(entity =>
-            {
-                entity.ToTable("InputTLFilesEvidence");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.FileName)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_name");
-
-                entity.Property(e => e.FilePath)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_path");
-
-                entity.Property(e => e.FileSize).HasColumnName("file_size");
-
-                entity.Property(e => e.FileType)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_type");
-
-                entity.Property(e => e.InputtlfilesId).HasColumnName("inputtlfiles_id");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-
-                entity.HasOne(d => d.Inputtlfiles)
-                    .WithMany(p => p.InputTlfilesEvidences)
-                    .HasForeignKey(d => d.InputtlfilesId)
-                    .HasConstraintName("FK__InputTLFi__input__49C3F6B7");
-            });
 
             modelBuilder.Entity<Notification>(entity =>
             {
@@ -174,107 +89,7 @@ namespace GesitAPI.Models
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Assign)
-                    .HasMaxLength(255)
-                    .HasColumnName("assign");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.DivisiBaru)
                     .IsRequired()
-                    .HasMaxLength(25)
-                    .HasColumnName("divisi_baru");
-
-                entity.Property(e => e.JatuhTempo)
-                    .HasColumnType("date")
-                    .HasColumnName("jatuh_tempo");
-
-                entity.Property(e => e.Lokasi)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("lokasi");
-
-                entity.Property(e => e.Masalah)
-                    .IsRequired()
-                    .HasColumnType("text")
-                    .HasColumnName("masalah");
-
-                entity.Property(e => e.NamaAudit)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("nama_audit");
-
-                entity.Property(e => e.Nomor).HasColumnName("nomor");
-
-                entity.Property(e => e.Pendapat)
-                    .IsRequired()
-                    .HasColumnType("text")
-                    .HasColumnName("pendapat");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("status");
-
-                entity.Property(e => e.TahunTemuan).HasColumnName("tahun_temuan");
-
-                entity.Property(e => e.UicBaru)
-                    .IsRequired()
-                    .HasMaxLength(25)
-                    .HasColumnName("uic_baru");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-            });
-
-            modelBuilder.Entity<Rhaevidence>(entity =>
-            {
-                entity.ToTable("RHAEvidence");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.FileName)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_name");
-
-                entity.Property(e => e.FilePath)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_path");
-
-                entity.Property(e => e.FileSize).HasColumnName("file_size");
-
-                entity.Property(e => e.FileType)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("file_type");
-
-                entity.Property(e => e.RhaId).HasColumnName("rha_id");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-
-                entity.HasOne(d => d.Rha)
-                    .WithMany(p => p.Rhaevidences)
-                    .HasForeignKey(d => d.RhaId)
-                    .HasConstraintName("FK__RHAEviden__rha_i__71D1E811");
-            });
-
-            modelBuilder.Entity<Rhafile>(entity =>
-            {
-                entity.ToTable("RHAFiles");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.Assign)
                     .HasMaxLength(255)
                     .HasColumnName("assign");
 
@@ -313,41 +128,99 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("rekomendasi");
 
-                entity.Property(e => e.StatusCompleted)
-                    .HasColumnName("status_completed")
-                    .HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.SubKondisi)
                     .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("sub_kondisi");
 
                 entity.Property(e => e.TargetDate)
-                    .HasColumnType("date")
+                    .HasColumnType("datetime")
                     .HasColumnName("target_date");
-
-                entity.Property(e => e.TindakLanjut)
-                    .HasMaxLength(255)
-                    .HasColumnName("tindak_lanjut");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("updated_at");
             });
 
-            modelBuilder.Entity<RhafilesEvidence>(entity =>
+            modelBuilder.Entity<SubRha>(entity =>
             {
-                entity.ToTable("RHAFilesEvidence");
+                entity.ToTable("SubRHA");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Assign)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("assign");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.DivisiBaru)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("divisi_baru");
+
+                entity.Property(e => e.JatuhTempo)
+                    .HasColumnType("date")
+                    .HasColumnName("jatuh_tempo");
+
+                entity.Property(e => e.Lokasi)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("lokasi");
+
+                entity.Property(e => e.Masalah)
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasColumnName("masalah");
+
+                entity.Property(e => e.NamaAudit)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("nama_audit");
+
+                entity.Property(e => e.Nomor).HasColumnName("nomor");
+
+                entity.Property(e => e.Pendapat)
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasColumnName("pendapat");
+
+                entity.Property(e => e.RhaId).HasColumnName("rha_id");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("status");
+
+                entity.Property(e => e.TahunTemuan).HasColumnName("tahun_temuan");
+
+                entity.Property(e => e.UicBaru)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("uic_baru");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("updated_at");
+
+                entity.HasOne(d => d.Rha)
+                    .WithMany(p => p.SubRhas)
+                    .HasForeignKey(d => d.RhaId)
+                    .HasConstraintName("FK__SubRHA__rha_id__18EBB532");
+            });
+
+            modelBuilder.Entity<SubRhaevidence>(entity =>
+            {
+                entity.ToTable("SubRHAEvidence");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
-
-                entity.Property(e => e.CreatedBy)
-                    .HasMaxLength(255)
-                    .HasColumnName("created_by");
 
                 entity.Property(e => e.FileName)
                     .IsRequired()
@@ -366,17 +239,16 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("file_type");
 
-                entity.Property(e => e.RhafilesId).HasColumnName("rhafiles_id");
+                entity.Property(e => e.SubRhaId).HasColumnName("sub_rha_id");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("updated_at");
 
-                entity.HasOne(d => d.Rhafiles)
-                    .WithMany(p => p.RhafilesEvidences)
-                    .HasForeignKey(d => d.RhafilesId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RHAFilesE__rhafi__5DCAEF64");
+                entity.HasOne(d => d.SubRha)
+                    .WithMany(p => p.SubRhaevidences)
+                    .HasForeignKey(d => d.SubRhaId)
+                    .HasConstraintName("FK__SubRHAEvi__sub_r__1BC821DD");
             });
 
             modelBuilder.Entity<TindakLanjut>(entity =>
@@ -410,16 +282,16 @@ namespace GesitAPI.Models
                     .HasColumnType("text")
                     .HasColumnName("notes");
 
-                entity.Property(e => e.RhaId).HasColumnName("rha_id");
+                entity.Property(e => e.SubRhaId).HasColumnName("sub_rha_id");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("updated_at");
 
-                entity.HasOne(d => d.Rha)
+                entity.HasOne(d => d.SubRha)
                     .WithMany(p => p.TindakLanjuts)
-                    .HasForeignKey(d => d.RhaId)
-                    .HasConstraintName("FK__TindakLan__rha_i__7D439ABD");
+                    .HasForeignKey(d => d.SubRhaId)
+                    .HasConstraintName("FK__TindakLan__sub_r__1EA48E88");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Data
 {
-    public interface IRha : ICrud<Rha>
+    public interface ISubRhaEvidence : ICrud<SubRhaevidence>
     {
-        Task<IEnumerable<Rha>> CountExistingFileNameRha(string filename);
+        Task<IEnumerable<SubRhaevidence>> CountExistingFileNameSubRhaEvidence(string filename);
     }
 }

@@ -107,7 +107,8 @@ namespace GesitAPI
 
             // Scope section
             services.AddScoped<IRha, RhaData>();
-            services.AddScoped<IRhaevidence, RhaevidenceData>();
+            services.AddScoped<ISubRha, SubRhaData>();
+            services.AddScoped<ISubRhaEvidence, SubRhaEvidenceData>();
             services.AddScoped<ITindakLanjut, TindakLanjutData>();
             services.AddScoped<INotification, NotificationData>();
         }
