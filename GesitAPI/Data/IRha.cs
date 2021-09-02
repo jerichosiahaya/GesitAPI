@@ -9,5 +9,6 @@ namespace GesitAPI.Data
     public interface IRha : ICrud<Rha>
     {
         Task<IEnumerable<Rha>> CountExistingFileNameRha(string filename);
+        Task<IEnumerable<Rha>> GetSubRHAByAssign(string assign);
     }
 }

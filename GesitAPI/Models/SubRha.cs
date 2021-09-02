@@ -14,7 +14,7 @@ namespace GesitAPI.Models
         }
 
         public int Id { get; set; }
-        public int? RhaId { get; set; }
+        public int RhaId { get; set; }
         public string DivisiBaru { get; set; }
         public string UicBaru { get; set; }
         public string NamaAudit { get; set; }

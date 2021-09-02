@@ -32,7 +32,7 @@ namespace GesitAPI.Controllers
         }
 
         List<string> allowedFileExtensions = new List<string>() { "jpg", "png", "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt", "zip", "rar" };
-        // GET: api/<TindakLanjutController>
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -41,7 +41,6 @@ namespace GesitAPI.Controllers
             return Ok(new { count = files.Count(), data = files });
         }
 
-        // GET api/<TindakLanjutController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -128,6 +127,7 @@ namespace GesitAPI.Controllers
             }
         }
 
+        // download tindak lanjut file
         [HttpGet("Download/{id}")]
         public async Task<IActionResult> DownloadSingleFile(int id)
         {
@@ -193,22 +193,5 @@ namespace GesitAPI.Controllers
             }
         }
 
-        // POST api/<TindakLanjutController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        // PUT api/<TindakLanjutController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        // DELETE api/<TindakLanjutController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

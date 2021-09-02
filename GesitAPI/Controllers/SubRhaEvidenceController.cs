@@ -33,7 +33,6 @@ namespace GesitAPI.Controllers
 
         List<string> allowedFileExtensions = new List<string>() { "jpg", "png", "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt", "zip", "rar" };
 
-        // GET: api/<SubRhaController>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -42,12 +41,32 @@ namespace GesitAPI.Controllers
             return Ok(new { count = files.Count(), data = files });
         }
 
-        // GET api/<SubRhaController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
             var results = await _subRhaEvidence.GetById(id);
             return Ok(new { data = results });
+        }
+
+        // download sub RHA evidence file
+        [HttpGet("Download/{id}")]
+        public async Task<IActionResult> DownloadSingleFile(int id)
+        {
+            var results = await _subRhaEvidence.GetById(id.ToString());
+            if (results == null)
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
+
+            var path = results.FilePath;
+            var fileName = results.FileName;
+            var fileType = results.FileType;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            byte[] arr = memory.ToArray();
+            memory.Position = 0;
+            return File(memory, fileType, fileName);
         }
 
         // POST & Upload Excel file

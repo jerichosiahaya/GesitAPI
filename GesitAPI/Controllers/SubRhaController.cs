@@ -59,6 +59,14 @@ namespace GesitAPI.Controllers
             return Ok(new { data = files });
         }
 
+        // GET assign with RHA (utama)
+        [HttpGet("GetByAssign/{assign}")]
+        public async Task<IActionResult> GetByAssign(string assign)
+        {
+            var results = await _subRha.GetByAssign(assign);
+            return Ok(new { data = results });
+        }
+
         // POST Upload Excel
         // TO DO jatuh_tempo, fix duplicated file names
         [HttpPost(nameof(Upload))]
@@ -98,7 +106,12 @@ namespace GesitAPI.Controllers
                             var obj = result.Tables[0];
                             var sheetName = obj.TableName;
                             var objCount = obj.Rows.Count;
-                            
+                            var colCount = obj.Columns.Count;
+
+                            // handling error
+                            if (colCount != 11)
+                                return BadRequest(new { status = false, message = "You're not using the correct template" });
+
                             for (int i = 0; i < objCount; i++)
                             {
                                 var rha = new SubRha(); // DI from Models
@@ -109,14 +122,15 @@ namespace GesitAPI.Controllers
                                 rha.Nomor = Convert.ToInt32(obj.Rows[i][4]);
                                 rha.Masalah = obj.Rows[i][5].ToString();
                                 rha.Pendapat = obj.Rows[i][6].ToString();
-                                rha.Status = obj.Rows[i][7].ToString(); ;
+                                rha.Status = obj.Rows[i][7].ToString();
+                                rha.JatuhTempo = Convert.ToDateTime(obj.Rows[i][8]);
                                 rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][9]);
                                 rha.Assign = obj.Rows[i][10].ToString();
                                 rha.RhaId = id;
                                 _db.SubRhas.Add(rha);
                             }
                             await _db.SaveChangesAsync();
-                            return Ok(new { status = true, count = objCount, sheet_name = sheetName, data = obj });
+                            return Ok(new { status = true, count = objCount, column_count = colCount, sheet_name = sheetName, data = obj });
                         }
                         catch (DbUpdateException dbEx)
                         {

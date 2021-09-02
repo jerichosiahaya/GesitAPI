@@ -21,10 +21,26 @@ namespace GesitAPI.Data
             return result;
         }
 
-        // TBC
-        public Task Delete(string id)
+        public async Task Delete(string id)
         {
-            throw new NotImplementedException();
+            var result = await GetById(id);
+            if (result != null)
+            {
+                try
+                {
+                    _db.Rhas.Remove(result);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+
+                    throw new Exception($"DbError: {dbEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error: {ex.Message}");
+                }
+            }
         }
 
         public async Task<IEnumerable<Rha>> GetAll()
@@ -36,7 +52,18 @@ namespace GesitAPI.Data
 
         public async Task<Rha> GetById(string id)
         {
-            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id)).Include(c => c.SubRhas).FirstOrDefaultAsync();
+            return result;
+        }
+
+        // GET Rha only with Sub RHA assign
+        public async Task<IEnumerable<Rha>> GetSubRHAByAssign(string assign)
+        {
+            var result = await _db.Rhas.Include(c => c.SubRhas.Where(o => o.Assign == assign))
+                                       .ThenInclude(o => o.SubRhaevidences)
+                                       .Where(x => x.SubRhas.Any())
+                                       .AsNoTracking()
+                                       .ToListAsync();
             return result;
         }
 

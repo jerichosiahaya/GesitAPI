@@ -33,6 +33,12 @@ namespace GesitAPI.Data
             return result;
         }
 
+        public async Task<IEnumerable<SubRha>> GetByAssign(string assign)
+        {
+            var result = await _db.SubRhas.Where(s => s.Assign == assign).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            return result;
+        }
+
         public async Task<SubRha> GetById(string id)
         {
             var result = await _db.SubRhas.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
