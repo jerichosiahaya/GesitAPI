@@ -130,6 +130,7 @@ namespace GesitAPI.Controllers
                                 _db.SubRhas.Add(rha);
                             }
                             await _db.SaveChangesAsync();
+                            //System.IO.File.Delete(filePath);
                             return Ok(new { status = true, count = objCount, column_count = colCount, sheet_name = sheetName, data = obj });
                         }
                         catch (DbUpdateException dbEx)

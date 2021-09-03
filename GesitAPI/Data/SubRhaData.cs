@@ -47,7 +47,7 @@ namespace GesitAPI.Data
 
         public async Task<IEnumerable<SubRha>> GetByRhaID(string idRha)
         {
-            var result = await _db.SubRhas.OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
             return result;
         }
 

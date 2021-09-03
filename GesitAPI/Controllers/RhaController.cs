@@ -200,6 +200,8 @@ namespace GesitAPI.Controllers
                 if (results == null)
                     return BadRequest(new { status = "Error", message = "There is no such a file" });
 
+                var filePath = results.FilePath;
+                System.IO.File.Delete(filePath);
                 await _rha.Delete(id.ToString());
                 return Ok(new { status = true, message = $"Successfully delete the RHA file with id: {id}"});
             }
