@@ -16,7 +16,7 @@ namespace GesitAPI.Controllers
     {
         //GET: api/<RequestHTTPController>
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(IRestResponse Data)
         {
             var client = new RestClient("https://jsonplaceholder.typicode.com/todos/1");
             //client.Authenticator = new HttpBasicAuthenticator("username", "password");
@@ -25,8 +25,10 @@ namespace GesitAPI.Controllers
             if (response == null)
             {
                 return NotFound();
-            } else {
-                return Ok();
+            }
+            else
+            {
+                return Ok(Data = response);
             }
 
         }
