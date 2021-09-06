@@ -57,13 +57,20 @@ namespace GesitAPI.Data
         }
 
         // GET Rha only with Sub RHA assign
-        public async Task<IEnumerable<Rha>> GetSubRHAByAssign(string assign)
+        public  IEnumerable<Rha> GetSubRHAByAssign(string assign)
         {
-            var result = await _db.Rhas.Include(c => c.SubRhas.Where(o => o.Assign == assign))
-                                       .ThenInclude(o => o.SubRhaevidences)
-                                       .Where(x => x.SubRhas.Any())
-                                       .AsNoTracking()
-                                       .ToListAsync();
+            //SubRha sbrha = new SubRha();
+            //var result = await _db.Rhas.Include(c => c.SubRhas.Where(o => o.Assign == assign))
+            //                           //.ThenInclude(o => o.SubRhaevidences)
+            //                           .Where(x => x.SubRhas.Any(c=>c.Assign != null))
+            //                           .AsNoTracking()
+            //                           .ToListAsync();
+
+            var result = _db.Rhas.SelectMany(r => r.SubRhas, (r, s) => new { r = r, s = s })
+                             .Where(temp0 => (temp0.s.Assign == assign))
+                             .Select(temp0 => temp0.r)
+                             .Distinct();
+
             return result;
         }
 

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RhaController : ControllerBase
@@ -62,7 +62,21 @@ namespace GesitAPI.Controllers
                 return NoContent();
             } else
             {
-                var result = await _rha.GetSubRHAByAssign(assign);
+
+                //var result = await _db.Rhas.Join(_db.SubRhas, o => o.Id, p => p.RhaId, (o, p) => new { Rha = o, Sub = p })
+                //    .Where(i => i.Sub.Assign == assign).Distinct().AsNoTracking().ToListAsync();
+
+                //var result = await _db.Rhas.Select(x => new { Rha = x, Things = x.SubRhas })
+                //    .Where(p=>p.Things.a)
+                //    .Select(o=>o.Rha)
+                //    .AsNoTracking().ToListAsync();
+
+                //var result =  _db.Rhas.SelectMany(r => r.SubRhas, (r, s) => new { r = r, s = s })
+                //             .Where(temp0 => (temp0.s.Assign == assign))
+                //             .Select(temp0 => temp0.r)
+                //             .Distinct();
+
+                var result = _rha.GetSubRHAByAssign(assign);
                 return Ok(new { data = result });
             }
         }

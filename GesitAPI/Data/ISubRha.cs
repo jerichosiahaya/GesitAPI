@@ -11,5 +11,6 @@ namespace GesitAPI.Data
         Task<IEnumerable<SubRha>> GetByRhaID(string idRha);
         Task<IEnumerable<SubRha>> CountExistingFileNameSubRha(string filename);
         Task<IEnumerable<SubRha>> GetByAssign(string assign);
+        Task<IEnumerable<SubRha>> GetByRhaIDandAssign(string idRha, string assign);
     }
 }

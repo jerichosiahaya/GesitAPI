@@ -67,6 +67,14 @@ namespace GesitAPI.Controllers
             return Ok(new { data = results });
         }
 
+        // GET sub rha by rha id and assign
+        [HttpGet("GetByRhaIDandAssign/{rhaId}/{assign}")]
+        public async Task<IActionResult> GetByRhaIDandAssign(string rhaId, string assign)
+        {
+            var results = await _subRha.GetByRhaIDandAssign(rhaId, assign);
+            return Ok(new { data = results });
+        }
+
         // POST Upload Excel
         // TO DO jatuh_tempo, fix duplicated file names
         [HttpPost(nameof(Upload))]
