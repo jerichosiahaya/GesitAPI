@@ -71,8 +71,9 @@ namespace GesitAPI.Controllers
 
         // POST & Upload Excel file
         [HttpPost(nameof(Upload))]
-        public async Task<IActionResult> Upload([Required] IFormFile formFile, [FromForm] SubRhaevidence subRhaEvidencefile)
+        public async Task<IActionResult> Upload([Required] IFormFile formFile, [FromForm] string notes, [FromForm] int subRhaId)
         {
+            SubRhaevidence subRhaEvidencefile = new SubRhaevidence();
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "SubRhaEvidence";
             var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
@@ -99,6 +100,8 @@ namespace GesitAPI.Controllers
 
                 subRhaEvidencefile.FileType = formFile.ContentType;
                 subRhaEvidencefile.FileSize = formFile.Length;
+                subRhaEvidencefile.Notes = notes;
+                subRhaEvidencefile.SubRhaId = subRhaId;
 
                 if (System.IO.File.Exists(filePath))
                 {

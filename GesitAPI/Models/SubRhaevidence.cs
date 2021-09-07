@@ -15,6 +15,7 @@ namespace GesitAPI.Models
         public string FilePath { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string Notes { get; set; }
 
         public virtual SubRha SubRha { get; set; }
     }

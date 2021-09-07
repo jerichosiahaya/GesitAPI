@@ -103,7 +103,7 @@ namespace GesitAPI.Controllers
                         await file.CopyToAsync(stream);
                         await _tindakLanjut.Insert(tindakLanjut);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = tindakLanjut.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
                 else
                 {
@@ -114,7 +114,7 @@ namespace GesitAPI.Controllers
                         await file.CopyToAsync(stream);
                         await _tindakLanjut.Insert(tindakLanjut);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = tindakLanjut.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
                 }
             }
             catch (DbUpdateException dbEx)

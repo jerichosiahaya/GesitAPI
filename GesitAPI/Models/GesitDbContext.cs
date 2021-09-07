@@ -241,6 +241,10 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("file_type");
 
+                entity.Property(e => e.Notes)
+                    .HasColumnType("text")
+                    .HasColumnName("notes");
+
                 entity.Property(e => e.SubRhaId).HasColumnName("sub_rha_id");
 
                 entity.Property(e => e.UpdatedAt)
