@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serialization.Json;
+using RestSharp.Serializers.NewtonsoftJson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,40 +22,32 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            // json serializer setting
+            JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                DefaultValueHandling = DefaultValueHandling.Include,
+                TypeNameHandling = TypeNameHandling.None,
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+            };
+
             var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
             var client = new RestClient("http://35.219.8.90:90/");
+            client.UseNewtonsoftJson(DefaultSettings);
             var request = new RestRequest("api/rha");
             request.AddHeader("authorization", "Bearer " + token);
             var response = client.Execute(request);
-            if (response == null)
+            if (response.Content == null)
             {
-                return NotFound();
+                return NotFound(response.StatusCode);
             }
             else
             {
-                return Ok(new { statusCode = response.StatusCode, data = response.Content });
+                //string jsonString = JsonSerializer.Serialize(response.Content);
+                return Ok(response.Content);
             }
         }
-
-        // GET api/<RequestHTTPController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<RequestHTTPController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<RequestHTTPController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        
     }
 }
