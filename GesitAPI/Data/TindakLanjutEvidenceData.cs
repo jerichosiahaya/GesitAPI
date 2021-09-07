@@ -10,7 +10,7 @@ namespace GesitAPI.Data
     {
         public Task Delete(string id)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); 
         }
 
         public Task<IEnumerable<TindakLanjutEvidence>> GetAll()
