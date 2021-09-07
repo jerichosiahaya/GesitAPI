@@ -110,6 +110,7 @@ namespace GesitAPI
             services.AddScoped<ISubRha, SubRhaData>();
             services.AddScoped<ISubRhaEvidence, SubRhaEvidenceData>();
             services.AddScoped<ITindakLanjut, TindakLanjutData>();
+            services.AddScoped<ITindakLanjutEvidence, TindakLanjutEvidenceData>();
             services.AddScoped<INotification, NotificationData>();
         }
 

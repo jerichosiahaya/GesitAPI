@@ -1,4 +1,5 @@
 ﻿using GesitAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,29 +9,55 @@ namespace GesitAPI.Data
 {
     public class TindakLanjutEvidenceData : ITindakLanjutEvidence
     {
+        private readonly GesitDbContext _db;
+        public TindakLanjutEvidenceData(GesitDbContext db)
+        {
+            _db = db;
+        }
         public Task Delete(string id)
         {
             throw new NotImplementedException(); 
         }
 
-        public Task<IEnumerable<TindakLanjutEvidence>> GetAll()
+        public async Task<IEnumerable<TindakLanjutEvidence>> CountExistingFileNameTLEvidence(string filename)
         {
-            throw new NotImplementedException();
+            var result = await _db.TindakLanjutEvidences.Where(s => s.FileName.Contains(filename)).AsNoTracking().ToListAsync();
+            return result;
         }
 
-        public Task<TindakLanjutEvidence> GetById(string id)
+        public async Task<IEnumerable<TindakLanjutEvidence>> GetAll()
         {
-            throw new NotImplementedException();
+            var result = await _db.TindakLanjutEvidences.OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            return result;
         }
 
-        public Task<IEnumerable<TindakLanjut>> GetByTindakLanjutID(string idTL)
+        public async Task<TindakLanjutEvidence> GetById(string id)
         {
-            throw new NotImplementedException();
+            var result = await _db.TindakLanjutEvidences.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            return result;
         }
 
-        public Task Insert(TindakLanjutEvidence obj)
+        public async Task<IEnumerable<TindakLanjutEvidence>> GetByTindakLanjutID(string idTL)
         {
-            throw new NotImplementedException();
+            var result = await _db.TindakLanjutEvidences.Where(s => s.TindaklanjutId == Convert.ToInt32(idTL)).AsNoTracking().ToListAsync();
+            return result;
+        }
+
+        public async Task Insert(TindakLanjutEvidence obj)
+        {
+            try
+            {
+                _db.TindakLanjutEvidences.Add(obj);
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception(dbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Task Update(string id, TindakLanjutEvidence obj)
