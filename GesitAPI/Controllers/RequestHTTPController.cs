@@ -19,8 +19,10 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var client = new RestClient("https://jsonplaceholder.typicode.com/");
-            var request = new RestRequest("todos/1");
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
+            var client = new RestClient("http://35.219.8.90:90/");
+            var request = new RestRequest("api/rha");
+            request.AddHeader("authorization", "Bearer " + token);
             var response = client.Execute(request);
             if (response == null)
             {
@@ -28,7 +30,7 @@ namespace GesitAPI.Controllers
             }
             else
             {
-                return Ok(response.Content);
+                return Ok(new { statusCode = response.StatusCode, data = response.Content });
             }
         }
 
