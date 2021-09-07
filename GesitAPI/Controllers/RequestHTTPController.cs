@@ -16,7 +16,7 @@ namespace GesitAPI.Controllers
     {
         //GET: api/<RequestHTTPController>
         [HttpGet]
-        public IActionResult Get(IRestResponse Data)
+        public IActionResult Get()
         {
             var client = new RestClient("https://jsonplaceholder.typicode.com/todos/1");
             //client.Authenticator = new HttpBasicAuthenticator("username", "password");
@@ -28,7 +28,7 @@ namespace GesitAPI.Controllers
             }
             else
             {
-                return Ok(Data = response);
+                return Ok(response);
             }
 
         }

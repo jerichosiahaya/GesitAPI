@@ -16,6 +16,6 @@ namespace GesitAPI.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        internal virtual SubRha SubRha { get; set; }
+        public virtual SubRha SubRha { get; set; }
     }
 }

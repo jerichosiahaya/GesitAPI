@@ -22,6 +22,7 @@ namespace GesitAPI.Models
         public virtual DbSet<SubRha> SubRhas { get; set; }
         public virtual DbSet<SubRhaevidence> SubRhaevidences { get; set; }
         public virtual DbSet<TindakLanjut> TindakLanjuts { get; set; }
+        public virtual DbSet<TindakLanjutEvidence> TindakLanjutEvidences { get; set; }
 
 //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 //        {
@@ -134,7 +135,7 @@ namespace GesitAPI.Models
                     .HasColumnName("sub_kondisi");
 
                 entity.Property(e => e.TargetDate)
-                    .HasColumnType("datetime")
+                    .HasColumnType("date")
                     .HasColumnName("target_date");
 
                 entity.Property(e => e.UpdatedAt)
@@ -209,6 +210,7 @@ namespace GesitAPI.Models
                 entity.HasOne(d => d.Rha)
                     .WithMany(p => p.SubRhas)
                     .HasForeignKey(d => d.RhaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__SubRHA__rha_id__18EBB532");
             });
 
@@ -292,6 +294,45 @@ namespace GesitAPI.Models
                     .WithMany(p => p.TindakLanjuts)
                     .HasForeignKey(d => d.SubRhaId)
                     .HasConstraintName("FK__TindakLan__sub_r__1EA48E88");
+            });
+
+            modelBuilder.Entity<TindakLanjutEvidence>(entity =>
+            {
+                entity.ToTable("TindakLanjutEvidence");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.FileName)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_name");
+
+                entity.Property(e => e.FilePath)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_path");
+
+                entity.Property(e => e.FileSize).HasColumnName("file_size");
+
+                entity.Property(e => e.FileType)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_type");
+
+                entity.Property(e => e.TindaklanjutId).HasColumnName("tindaklanjut_id");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("updated_at");
+
+                entity.HasOne(d => d.Tindaklanjut)
+                    .WithMany(p => p.TindakLanjutEvidences)
+                    .HasForeignKey(d => d.TindaklanjutId)
+                    .HasConstraintName("FK__TindakLan__tinda__3493CFA7");
             });
 
             OnModelCreatingPartial(modelBuilder);

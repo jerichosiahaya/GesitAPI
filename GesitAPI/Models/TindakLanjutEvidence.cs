@@ -5,16 +5,10 @@ using System.Collections.Generic;
 
 namespace GesitAPI.Models
 {
-    public partial class TindakLanjut
+    public partial class TindakLanjutEvidence
     {
-        public TindakLanjut()
-        {
-            TindakLanjutEvidences = new HashSet<TindakLanjutEvidence>();
-        }
-
         public int Id { get; set; }
-        public int? SubRhaId { get; set; }
-        public string Notes { get; set; }
+        public int? TindaklanjutId { get; set; }
         public string FileName { get; set; }
         public string FileType { get; set; }
         public long FileSize { get; set; }
@@ -22,7 +16,6 @@ namespace GesitAPI.Models
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        public virtual SubRha SubRha { get; set; }
-        public virtual ICollection<TindakLanjutEvidence> TindakLanjutEvidences { get; set; }
+        public virtual TindakLanjut Tindaklanjut { get; set; }
     }
 }
