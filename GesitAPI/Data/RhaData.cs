@@ -92,9 +92,34 @@ namespace GesitAPI.Data
         }
 
         // TBC
-        public Task Update(string id, Rha obj)
+        public async Task Update(string id, Rha obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await GetById(id);
+                if (result != null)
+                {
+                    result.Kondisi = obj.Kondisi;
+                    result.SubKondisi = obj.SubKondisi;
+                    result.Rekomendasi = obj.Rekomendasi;
+                    result.TargetDate = obj.TargetDate;
+                    result.Assign = obj.Assign;
+                    await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception($"Data {id} not found");
+                }
+            }
+            catch (DbUpdateException DbEx)
+            {
+
+                throw new Exception(DbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

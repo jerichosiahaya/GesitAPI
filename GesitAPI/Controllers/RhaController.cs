@@ -225,6 +225,21 @@ namespace GesitAPI.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Rha rha)
+        {
+            try
+            {
+                await _rha.Update(id.ToString(), rha);
+                return Ok($"Data {rha.Id} berhasil diupdate!");
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         // POST & Read Excel content
         //[HttpPost(nameof(UploadExcel))]
         //public async Task<IActionResult> UploadExcel([Required] IFormFile formFile, [FromForm] Rha rhafile)

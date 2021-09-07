@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RestSharp;
 using RestSharp.Authenticators;
+using RestSharp.Serialization.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,19 +19,17 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var client = new RestClient("https://jsonplaceholder.typicode.com/todos/1");
-            //client.Authenticator = new HttpBasicAuthenticator("username", "password");
-            var request = new RestRequest("statuses/home_timeline.json", DataFormat.Json);
-            var response = client.Get(request);
+            var client = new RestClient("https://jsonplaceholder.typicode.com/");
+            var request = new RestRequest("todos/1");
+            var response = client.Execute(request);
             if (response == null)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(response);
+                return Ok(response.Content);
             }
-
         }
 
         // GET api/<RequestHTTPController>/5
