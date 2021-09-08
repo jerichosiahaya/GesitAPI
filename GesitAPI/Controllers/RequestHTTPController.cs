@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GesitAPI.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -19,23 +20,24 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class RequestHTTPController : ControllerBase
     {
-        //GET: api/<RequestHTTPController>
-        [HttpGet]
-        public IActionResult Get(string npp, string password)
+        
+        JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
         {
-            // json serializer setting
-            JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DefaultValueHandling = DefaultValueHandling.Include,
-                TypeNameHandling = TypeNameHandling.None,
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented,
-                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-            };
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            DefaultValueHandling = DefaultValueHandling.Include,
+            TypeNameHandling = TypeNameHandling.None,
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+        };
 
-            //var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
-            var token = Authentication(npp, password);
+        [HttpGet(nameof(GesitRha))]
+        public IActionResult GesitRha(string npp, string password)
+        {
+            // DI from Helpers
+            Authentication auth = new Authentication();
+            var token = auth.GesitAuth(npp, password);
+
             var client = new RestClient("http://35.219.8.90:90/");
             client.UseNewtonsoftJson(DefaultSettings);
             var request = new RestRequest("api/rha");
@@ -54,33 +56,24 @@ namespace GesitAPI.Controllers
             }
         }
 
-        private string Authentication(string npp, string password)
+        [HttpGet(nameof(Progo))]
+        public IActionResult Progo(string kategori)
         {
-            //var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
-            JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DefaultValueHandling = DefaultValueHandling.Include,
-                TypeNameHandling = TypeNameHandling.None,
-                NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented,
-                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-            };
-            var client = new RestClient("http://35.219.8.90:90/");
+            var client = new RestClient("http://35.219.107.102/");
             client.UseNewtonsoftJson(DefaultSettings);
-            var request = new RestRequest("api/Authentication?npp="+npp+"&password="+password);
+            var request = new RestRequest("progodev/api/project?kategori="+kategori);
+            request.AddHeader("progo-key", "progo123");
             var response = client.Execute(request);
             if (response.Content == null)
             {
-                return null;
+                return NotFound(response.StatusCode);
             }
             else
             {
-                JObject obj = JObject.Parse(response.Content);
-                string token = (string)obj["token"];
-                return token;
+                return Ok(response.Content);
             }
         }
+
 
     }
 }
