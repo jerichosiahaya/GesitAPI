@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -20,7 +21,7 @@ namespace GesitAPI.Controllers
     {
         //GET: api/<RequestHTTPController>
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(string npp, string password)
         {
             // json serializer setting
             JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
@@ -33,7 +34,8 @@ namespace GesitAPI.Controllers
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
             };
 
-            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
+            //var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
+            var token = Authentication(npp, password);
             var client = new RestClient("http://35.219.8.90:90/");
             client.UseNewtonsoftJson(DefaultSettings);
             var request = new RestRequest("api/rha");
@@ -46,8 +48,39 @@ namespace GesitAPI.Controllers
             else
             {
                 //string jsonString = JsonSerializer.Serialize(response.Content);
+                JObject obj = JObject.Parse(response.Content);
+                string name = (string)obj["data"][0]["id"];
                 return Ok(response.Content);
             }
         }
+
+        private string Authentication(string npp, string password)
+        {
+            //var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYmYiOjE2MzEwMTEyNjcsImV4cCI6MTYzMTYxNjA2NiwiaWF0IjoxNjMxMDExMjY3fQ.1Lmq1dMOAcuU3qNqJ2cm-be-sRJAULu288kzGHpojac";
+            JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                DefaultValueHandling = DefaultValueHandling.Include,
+                TypeNameHandling = TypeNameHandling.None,
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+            };
+            var client = new RestClient("http://35.219.8.90:90/");
+            client.UseNewtonsoftJson(DefaultSettings);
+            var request = new RestRequest("api/Authentication?npp="+npp+"&password="+password);
+            var response = client.Execute(request);
+            if (response.Content == null)
+            {
+                return null;
+            }
+            else
+            {
+                JObject obj = JObject.Parse(response.Content);
+                string token = (string)obj["token"];
+                return token;
+            }
+        }
+
     }
 }
