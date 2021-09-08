@@ -55,7 +55,7 @@ namespace GesitAPI.Controllers
         }
 
         [HttpGet(nameof(Progo))]
-        public IActionResult Progo(string kategori)
+        public IActionResult Progo(string kategori, string divisi)
         {
             var client = new RestClient("http://35.219.107.102/");
             client.UseNewtonsoftJson(DefaultSettings);
@@ -69,9 +69,11 @@ namespace GesitAPI.Controllers
             else
             {
                 JObject obj = JObject.Parse(response.Content);
-                var pdm = obj["data"].Where(jt => (string)jt["Divisi"] == "PDM").ToList();
+                var pdm = obj["data"].Where(jt => (string)jt["Divisi"] == divisi).ToList();
+                if (pdm.Count == 0)
+                    return NoContent();
                 //return Ok(obj["data"][10]);
-                return Ok(pdm[0]);
+                return Ok(pdm);
             }
         }
 
