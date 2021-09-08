@@ -20,7 +20,7 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class RequestHTTPController : ControllerBase
     {
-        
+        // json serialize setting
         JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -50,8 +50,6 @@ namespace GesitAPI.Controllers
             else
             {
                 //string jsonString = JsonSerializer.Serialize(response.Content);
-                JObject obj = JObject.Parse(response.Content);
-                string name = (string)obj["data"][0]["id"];
                 return Ok(response.Content);
             }
         }
@@ -70,7 +68,10 @@ namespace GesitAPI.Controllers
             }
             else
             {
-                return Ok(response.Content);
+                JObject obj = JObject.Parse(response.Content);
+                var pdm = obj["data"].Where(jt => (string)jt["Divisi"] == "PDM").ToList();
+                //return Ok(obj["data"][10]);
+                return Ok(pdm[0]);
             }
         }
 
