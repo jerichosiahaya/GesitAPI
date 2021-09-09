@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// Author: Jericho Cristofel Siahaya
+// Created: 2021-09-09
+
 namespace GesitAPI.Helpers
 {
     public class Authentication
