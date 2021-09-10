@@ -34,6 +34,19 @@ namespace GesitAPI.Controllers
             ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
         };
 
+        public class MyItem
+        {
+            public decimal? status_completed { get; set; }
+            public string name { get; set; }
+            public string address { get; set; }
+            public int? age { get; set; }
+        }
+
+        public class Root
+        {
+            public List<MyItem> data { get; set; }
+        }
+
         [HttpGet(nameof(GesitRha))]
         public IActionResult GesitRha(string npp, string password)
         {
@@ -60,6 +73,30 @@ namespace GesitAPI.Controllers
             }
         }
 
+        [HttpGet(nameof(test))]
+        public IActionResult test()
+        {
+            var client = new RestClient("https://gist.githubusercontent.com/");
+            client.UseNewtonsoftJson();
+            var request = new RestRequest("jerichosiahaya/ba36e2a9ba40d24c0f530eb2f57dcad2/raw/bcc1b39504039facff6fbd7000e40ee57ed59b58/dummydata.json");
+            var response = client.Execute(request);
+
+            var result = JsonConvert.DeserializeObject<Root>(response.Content);
+            //var total = 0;
+            foreach (var item in result.data)
+            {
+                var total = 0;
+                total = item.GetType()
+                    .GetProperties()
+                    .Select(x => x.GetValue(item, null))
+                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+                
+                item.status_completed = (total-1)/3m;
+            }
+            return Ok(result);
+        }
+
+        //var result = obj["data"].Where(jt => (string)jt["name"] == "John Doe").ToList();
         //[HttpGet(nameof(Progo))]
         //public IActionResult Progo(string kategori, string divisi)
         //{
