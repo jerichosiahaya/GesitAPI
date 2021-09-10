@@ -34,9 +34,19 @@ namespace GesitAPI.Controllers
             ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
         };
 
+        public class Info
+        {
+            public int status { get; set; }
+        }
+
         public class MyItem
         {
-            public decimal? status_completed { get; set; }
+            public MyItem()
+            {
+                info = new List<Info>();
+            }
+            public List<Info> info { get; set; }
+
             public string name { get; set; }
             public string address { get; set; }
             public int? age { get; set; }
@@ -82,7 +92,6 @@ namespace GesitAPI.Controllers
             var response = client.Execute(request);
 
             var result = JsonConvert.DeserializeObject<Root>(response.Content);
-            //var total = 0;
             foreach (var item in result.data)
             {
                 var total = 0;
@@ -90,8 +99,7 @@ namespace GesitAPI.Controllers
                     .GetProperties()
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
-                
-                item.status_completed = (total-1)/3m;
+                item.info.Add(new Info() { status = total });
             }
             return Ok(result);
         }
