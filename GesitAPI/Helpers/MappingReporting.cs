@@ -11,6 +11,8 @@ namespace GesitAPI.Helpers
         public decimal PercentageCompleted { get; set; }
         public int CountCompleted { get; set; }
         public int CountUncompleted { get; set; }
+        public Dictionary<string, string> Completed { get; set; }
+        public Dictionary<string,string> Uncompleted { get; set; }
     } 
 
     public class MappingReporting
