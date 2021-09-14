@@ -1,4 +1,5 @@
-﻿using GesitAPI.Models;
+﻿using GesitAPI.Dtos;
+using GesitAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,6 @@ namespace GesitAPI.Data
             var result = await _db.SubRhaevidences.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
             return result;
         }
-
         public async Task Insert(SubRhaevidence obj)
         {
             try

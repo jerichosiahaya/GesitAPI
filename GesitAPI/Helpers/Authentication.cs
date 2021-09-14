@@ -41,5 +41,35 @@ namespace GesitAPI.Helpers
                 return token;
             }
         }
+
+        public string GesitSelfAuth()
+        {
+            JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                DefaultValueHandling = DefaultValueHandling.Include,
+                TypeNameHandling = TypeNameHandling.None,
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented,
+                ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+            };
+            var npp = "P02021";
+            var password = "Admin123";
+            var client = new RestClient("http://35.219.8.90:90/");
+            client.UseNewtonsoftJson(DefaultSettings);
+            var request = new RestRequest("api/Authentication?npp=" + npp + "&password=" + password);
+            var response = client.Execute(request);
+            if (response.Content == null)
+            {
+                return null;
+            }
+            else
+            {
+                JObject obj = JObject.Parse(response.Content);
+                string token = (string)obj["token"];
+                return token;
+            }
+        }
+
     }
 }

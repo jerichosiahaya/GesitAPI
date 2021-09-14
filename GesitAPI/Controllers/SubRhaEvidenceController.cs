@@ -1,4 +1,5 @@
 ﻿using GesitAPI.Data;
+using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -36,9 +37,45 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            string webPath = "http://35.219.8.90:90/";
+            var downloadLink = webPath + "api/SubRhaEvidence/DownloadFile?subRhaId=";
             var results = await _subRhaEvidence.GetAll();
-            var files = results.ToList();
-            return Ok(new { count = files.Count(), data = files });
+            List<SubRhaEvidenceDto> subRhaData = new List<SubRhaEvidenceDto>();
+            foreach (var item in results)
+            {
+                subRhaData.Add(new SubRhaEvidenceDto
+                {
+                    Id = item.Id,
+                    SubRhaId = item.SubRhaId,
+                    Notes = item.Notes,
+                    FileName = item.FileName,
+                    UpdatedAt = item.UpdatedAt,
+                    CreatedAt = item.CreatedAt,
+                    Download = downloadLink + item.Id
+                });
+            };
+            return Ok(new { count = results.Count(), data = subRhaData });
+        }
+
+        [AllowAnonymous]
+        [HttpGet(nameof(DownloadFile))]
+        public async Task<IActionResult> DownloadFile(int subRhaId)
+        {
+            var results = await _subRhaEvidence.GetById(subRhaId.ToString());
+            if (results == null)
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
+
+            var path = results.FilePath;
+            var fileName = results.FileName;
+            var fileType = results.FileType;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            byte[] arr = memory.ToArray();
+            memory.Position = 0;
+            return File(memory, fileType, fileName);
         }
 
         [HttpGet("{id}")]

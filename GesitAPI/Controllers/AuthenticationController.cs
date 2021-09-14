@@ -45,7 +45,6 @@ namespace GesitAPI.Controllers
             var user = _users.SingleOrDefault(x => x.npp == npp && x.password == password);
             if (user == null)
                 return BadRequest(new { status = "Error", message = "User not found" });
-            //var token = generateJwtToken(user);
 
             UserDto userData = new UserDto() { 
                 Id = user.id,

@@ -13,7 +13,6 @@ namespace GesitAPI.Models
         public string email { get; set; }
         public string name { get; set; }
         public string role { get; set; }
-        [JsonIgnore]
         public string password { get; set; }
     }
 }

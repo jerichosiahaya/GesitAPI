@@ -1,4 +1,5 @@
-﻿using GesitAPI.Models;
+﻿using GesitAPI.Dtos;
+using GesitAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
