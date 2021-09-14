@@ -11,11 +11,9 @@ namespace GesitAPI.Dtos
         {
             public List<MappingReporting> data { get; set; }
         }
-
-
         public class StatusInfo
         {
-            public int StatusCompleted { get; set; }
+            public string Status { get; set; }
             public decimal PercentageCompleted { get; set; }
             public int CountCompleted { get; set; }
             public int CountUncompleted { get; set; }

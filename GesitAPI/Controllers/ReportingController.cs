@@ -42,7 +42,7 @@ namespace GesitAPI.Controllers
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
-                var statusCompleted = 0;
+                var statusCompleted = "Uncomplete";
                 if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
                 {
                     total = item.GetType()
@@ -93,10 +93,10 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 9m;
 
                     if (uncompletedCount <= 0)
-                        statusCompleted = 1;
+                        statusCompleted = "Complete";
 
                     item.StatusInfo.Add(new StatusInfo() { 
-                        StatusCompleted = statusCompleted,
+                        Status = statusCompleted,
                         CountUncompleted = uncompletedCount,
                         CountCompleted = completedCount,
                         PercentageCompleted = percentageCompleted,
@@ -152,11 +152,11 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 11m;
 
                     if (uncompletedCount <= 0)
-                        statusCompleted = 1;
+                        statusCompleted = "Complete";
 
                     item.StatusInfo.Add(new StatusInfo()
                     {
-                        StatusCompleted = statusCompleted,
+                        Status = statusCompleted,
                         CountUncompleted = uncompletedCount,
                         CountCompleted = completedCount,
                         PercentageCompleted = percentageCompleted,
