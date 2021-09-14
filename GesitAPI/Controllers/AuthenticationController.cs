@@ -1,4 +1,5 @@
-﻿using GesitAPI.Helpers;
+﻿using GesitAPI.Dtos;
+using GesitAPI.Helpers;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,9 +45,17 @@ namespace GesitAPI.Controllers
             var user = _users.SingleOrDefault(x => x.npp == npp && x.password == password);
             if (user == null)
                 return BadRequest(new { status = "Error", message = "User not found" });
+            //var token = generateJwtToken(user);
 
-            var token = generateJwtToken(user);
-            return Ok(new { status = "Success", user = user, token });
+            UserDto userData = new UserDto() { 
+                Id = user.id,
+                Npp = user.npp,
+                Name = user.name,
+                Role = user.role,
+                Token = generateJwtToken(user)
+            };
+
+            return Ok(new { status = "Success", data = userData });
         }
 
         private string generateJwtToken(User user)

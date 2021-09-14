@@ -1,4 +1,5 @@
 ﻿using GesitAPI.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RestSharp;
@@ -7,20 +8,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static GesitAPI.Dtos.ReportingDto;
 
 // Author: Jericho Siahaya
 // Created: 2021-09-10
 
 namespace GesitAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReportingController : ControllerBase
     {
-        public class Root
-        {
-            public List<MappingReporting> data { get; set; }
-        }
+        //public class Root
+        //{
+        //    public List<MappingReporting> data { get; set; }
+        //}
 
         [HttpGet(nameof(RPTI))]
         public IActionResult RPTI(string kategori)
