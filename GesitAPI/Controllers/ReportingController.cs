@@ -20,12 +20,8 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class ReportingController : ControllerBase
     {
-        //public class Root
-        //{
-        //    public List<MappingReporting> data { get; set; }
-        //}
 
-        [HttpGet(nameof(RPTI))]
+        [HttpGet("{kategori}")]
         public IActionResult RPTI(string kategori)
         {
             var client = new RestClient("http://35.219.107.102/");
@@ -34,7 +30,7 @@ namespace GesitAPI.Controllers
             request.AddHeader("progo-key", "progo123");
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Root>(response.Content);
-            if (result.data.Count() <= 0)
+            if (result.data.Count <= 0)
                 return NoContent();
             foreach (var item in result.data)
             {
@@ -42,7 +38,7 @@ namespace GesitAPI.Controllers
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
-                var statusCompleted = "Uncomplete";
+                string statusCompleted = null;
                 if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
                 {
                     total = item.GetType()
@@ -54,7 +50,8 @@ namespace GesitAPI.Controllers
                     && x.Name != "Divisi" && x.Name != "LOB"
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId" && x.Name != "StatusInfo")
+                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId" 
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
 
@@ -68,7 +65,7 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId" 
-                    && x.Name != "StatusInfo")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(pi => new { Val = (string)pi.GetValue(item), Name = pi.Name })
                     .Where(pi => !string.IsNullOrEmpty(pi.Val))
                     .ToDictionary(pi => pi.Name, pi => pi.Val);
@@ -83,17 +80,24 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" )
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(pi => new { Val = (string)pi.GetValue(item), Name = pi.Name })
                     .Where(pi => string.IsNullOrEmpty(pi.Val))
                     .ToDictionary(pi => pi.Name, pi => pi.Val);
 
                     uncompletedCount = total;
-                    completedCount = 9- uncompletedCount;
+                    completedCount = 9-uncompletedCount;
                     percentageCompleted = completedCount / 9m;
+                    
 
-                    if (uncompletedCount <= 0)
-                        statusCompleted = "Complete";
+                    // status complete from StatusAIP
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        statusCompleted = "Completed";
+                    } else
+                    {
+                        statusCompleted = "Uncomplete";
+                    }
 
                     item.StatusInfo.Add(new StatusInfo() { 
                         Status = statusCompleted,
@@ -115,7 +119,8 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
-                    && x.Name != "status_completed" && x.Name != "AIPId" && x.Name != "StatusInfo")
+                    && x.Name != "status_completed" && x.Name != "AIPId" 
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
@@ -128,7 +133,7 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(pi => new { Val = (string)pi.GetValue(item), Name = pi.Name })
                     .Where(pi => !string.IsNullOrEmpty(pi.Val) && pi.Val is not "0") // delete this if capex/opex 0 is not counted as null
                     .ToDictionary(pi => pi.Name, pi => pi.Val);
@@ -142,7 +147,7 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
                     .Select(pi => new { Val = (string)pi.GetValue(item), Name = pi.Name })
                     .Where(v => v.Val is null || (v.Val is string a && string.IsNullOrWhiteSpace(a)) || v.Val is "0") // delete this if capex/opex 0 is not counted as null
                     .ToDictionary(pi => pi.Name, pi => pi.Val);
@@ -151,8 +156,15 @@ namespace GesitAPI.Controllers
                     completedCount = 11 - uncompletedCount;
                     percentageCompleted = completedCount / 11m;
 
-                    if (uncompletedCount <= 0)
-                        statusCompleted = "Complete";
+                    // status complete from StatusAIP
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        statusCompleted = "Completed";
+                    }
+                    else
+                    {
+                        statusCompleted = "Uncomplete";
+                    }
 
                     item.StatusInfo.Add(new StatusInfo()
                     {

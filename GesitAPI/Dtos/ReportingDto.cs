@@ -53,6 +53,7 @@ namespace GesitAPI.Dtos
             public string LokasiDRC { get; set; }
             public string EstimasiBiayaCapex { get; set; }
             public string EstimasiBiayaOpex { get; set; }
+            public string statusAIP { get; set; }
         }
     }
 }
