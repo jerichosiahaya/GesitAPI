@@ -8,7 +8,7 @@ namespace GesitAPI.Models
     public partial class Notification
     {
         public int Id { get; set; }
-        public int ProjectId { get; set; }
+        public string ProjectId { get; set; }
         public string ProjectCategory { get; set; }
         public string ProjectTitle { get; set; }
         public string ProjectDocument { get; set; }

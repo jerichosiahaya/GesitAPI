@@ -65,7 +65,9 @@ namespace GesitAPI.Models
                     .HasMaxLength(150)
                     .HasColumnName("project_document");
 
-                entity.Property(e => e.ProjectId).HasColumnName("project_id");
+                entity.Property(e => e.ProjectId)
+                .HasMaxLength(255)
+                .HasColumnName("project_id");
 
                 entity.Property(e => e.ProjectTitle)
                     .IsRequired()
