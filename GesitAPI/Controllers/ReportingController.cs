@@ -15,7 +15,7 @@ using static GesitAPI.Dtos.ReportingDto;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReportingController : ControllerBase

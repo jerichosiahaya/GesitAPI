@@ -34,21 +34,36 @@ namespace GesitAPI.Controllers
             ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
         };
 
-        public class Info
+        // 
+
+        public class Response
         {
-            public int status { get; set; }
+            public Response()
+            {
+                data = new List<ResponseData>();
+            }
+            public string division { get; set; }
+            public List<ResponseData> data { get; set; }
         }
+
+
+        public class ResponseData
+        {
+            public string name { get; set; }
+            public string address { get; set; }
+            public int married { get; set; }
+            public string division { get; set; }
+            public int? age { get; set; }
+        }
+
+        // 1
 
         public class MyItem
         {
-            public MyItem()
-            {
-                info = new List<Info>();
-            }
-            public List<Info> info { get; set; }
-
             public string name { get; set; }
             public string address { get; set; }
+            public int married { get; set; }
+            public string division { get; set; }
             public int? age { get; set; }
         }
 
@@ -88,173 +103,37 @@ namespace GesitAPI.Controllers
         {
             var client = new RestClient("https://gist.githubusercontent.com/");
             client.UseNewtonsoftJson();
-            var request = new RestRequest("jerichosiahaya/ba36e2a9ba40d24c0f530eb2f57dcad2/raw/bcc1b39504039facff6fbd7000e40ee57ed59b58/dummydata.json");
+            var request = new RestRequest("jerichosiahaya/ba36e2a9ba40d24c0f530eb2f57dcad2/raw/28b84a4cb332ef95e9bea28403002910069b4481/dummydata.json");
             var response = client.Execute(request);
 
             var result = JsonConvert.DeserializeObject<Root>(response.Content);
-            foreach (var item in result.data)
-            {
-                var total = 0;
-                total = item.GetType()
-                    .GetProperties()
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
-                item.info.Add(new Info() { status = total });
-            }
-            return Ok(result);
+
+            var groupByDivision = result.data.Where(x => x.division != null)
+                .GroupBy(e => e.division, (d, r) => new Response()
+                  {
+                      division = d,
+                      data =  r.Select(x => new ResponseData() { name = x.name, address = x.address }).ToList()
+
+                })
+                  .ToList();
+
+            //List<object> vList = new List<object>();
+            //foreach (var group in groupByDivision)
+            //{
+            //    vList.Add(group.ToList());
+            //}
+
+            //foreach (var item in result.data)
+            //{
+            //    var total = 0;
+            //    total = item.GetType()
+            //        .GetProperties()
+            //        .Select(x => x.GetValue(item, null))
+            //        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+            //    item.info.Add(new Info() { status = total });
+            //}
+
+            return Ok(groupByDivision);
         }
-
-        //var result = obj["data"].Where(jt => (string)jt["name"] == "John Doe").ToList();
-        //[HttpGet(nameof(Progo))]
-        //public IActionResult Progo(string kategori, string divisi)
-        //{
-        //    var client = new RestClient("http://35.219.107.102/");
-        //    client.UseNewtonsoftJson(DefaultSettings);
-        //    // string kategori added to the URL scheme
-        //    var request = new RestRequest("progodev/api/project?kategori="+kategori);
-        //    request.AddHeader("progo-key", "progo123");
-        //    var response = client.Execute(request);
-        //    JObject obj = JObject.Parse(response.Content);
-        //    if (!obj.ContainsKey("status"))
-        //    {
-        //        return NotFound(response.StatusCode);
-        //    }
-        //    else
-        //    {
-        //        //JObject obj = JObject.Parse(response.Content);
-        //        // string divisi added as parameter of the where clause
-        //        var pdm = obj["data"].Where(jt => (string)jt["AIPId"] == divisi).ToList();
-        //        if (pdm.Count == 0)
-        //            return NoContent();
-        //        //return Ok(obj["data"][10]);
-        //        return Ok(new { message = "tes", data = pdm });
-        //    }
-        //}
-
-        //[HttpGet(nameof(ProgoDokumen))]
-        //public IActionResult ProgoDokumen(string aipId)
-        //{
-
-        //    var client = new RestClient("http://35.219.107.102/");
-        //    client.UseNewtonsoftJson(DefaultSettings);
-        //    // string kategori added to the URL scheme
-        //    var request = new RestRequest("progodev/api/dokumen?AIPId=" + aipId);
-        //    request.AddHeader("progo-key", "progo123");
-        //    var response = client.Execute(request);
-        //    if (response.Content == null)
-        //    {
-        //        return NotFound(response.StatusCode);
-        //    }
-        //    else
-        //    {
-        //        JObject obj = JObject.Parse(response.Content);
-        //        return Ok(obj);
-        //    }
-        //}
-
-        //[HttpGet(nameof(ProgoDivisi))]
-        //public IActionResult ProgoDivisi(string kategori)
-        //{
-
-        //    var client = new RestClient("http://35.219.107.102/");
-        //    client.UseNewtonsoftJson(DefaultSettings);
-        //    // string kategori added to the URL scheme
-        //    var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-        //    request.AddHeader("progo-key", "progo123");
-        //    var response = client.Execute(request);
-        //    if (response.Content == null)
-        //    {
-        //        return NotFound(response.StatusCode);
-        //    }
-        //    else
-        //    {
-        //        JObject obj = JObject.Parse(response.Content);
-        //        var listDivisi = obj["data"];
-        //        List<string> div = new List<string>();
-        //        for (int i = 0; i < listDivisi.Count(); i++)
-        //        {
-        //            var a = obj["data"][i]["Divisi"];
-        //            div.Add(a.ToString());
-        //        }
-        //        return Ok(div.Distinct());
-        //    }
-        //}
-
-        //[HttpGet(nameof(ProgoMerged))]
-        //public IActionResult ProgoMerged(string kategori, string aipId)
-        //{
-        //    var client = new RestClient("http://35.219.107.102/");
-        //    client.UseNewtonsoftJson(DefaultSettings);
-
-        //    var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-        //    var request2 = new RestRequest("progodev/api/dokumen?AIPId=" + aipId);
-        //    request.AddHeader("progo-key", "progo123");
-        //    request2.AddHeader("progo-key", "progo123");
-
-        //    var response = client.Execute(request);
-        //    var response2 = client.Execute(request2);
-
-        //    JObject obj = JObject.Parse(response.Content);
-        //    JObject obj2 = JObject.Parse(response2.Content);
-
-        //    if (!obj.ContainsKey("status"))
-        //    {
-        //        return NotFound(response.StatusCode);
-        //    }
-        //    else
-        //    {
-        //        var noDok = obj["data"].Where(jt => (string)jt["AIPId"] == aipId).ToList();
-        //        var dok = obj2["data"];
-
-        //        // perhitungan status
-        //        var a = obj["data"].Where(jt => (string)jt["AIPId"] == aipId).Select(s => new 
-        //        {
-        //            b1 = (string)s["ProjectCategory"], 
-        //            b2 = (string)s["JenisPengembangan"],
-        //            b3 = (string)s["Pengembang"],
-        //            b4 = (string)s["EksImplementasi"],
-        //            b5 = (string)s["NamaProject"],
-        //            b6 = (string)s["NamaAIP"],
-        //            b7 = (string)s["StrategicImportance"],
-        //            b8 = (string)s["PPJTIPihakTerkait"]
-        //        }).ToList();
-
-        //        List<string> vs = new List<string>();
-        //        a.ForEach(o =>
-        //        {
-        //            string k1 = o.b1.ToString();
-        //            string k2 = o.b2.ToString();
-        //            string k3 = o.b3.ToString();
-        //            string k4 = o.b4.ToString();
-        //            string k5 = o.b5.ToString();
-        //            string k6 = o.b6.ToString();
-        //            string k7 = o.b7.ToString();
-        //            string k8 = o.b8.ToString();
-        //            vs.Add(k1);
-        //            vs.Add(k2);
-        //            vs.Add(k3);
-        //            vs.Add(k4);
-        //            vs.Add(k5);
-        //            vs.Add(k6);
-        //            vs.Add(k7);
-        //            vs.Add(k8);
-        //        });
-        //        vs = vs.Where(o => o != "" && o != null).ToList();
-
-        //        // pembagian
-        //        int countItems = vs.Count();
-        //        decimal statusResult = countItems / 8m;
-
-        //        // new json info
-        //        var info = new
-        //        {
-        //            percentage_completed = statusResult,
-        //            completed = countItems,
-        //            uncompleted = 8 - countItems
-        //        };
-
-        //        return Ok(new { info = info, data = noDok, dokumen = dok });
-        //    }
-        //}
     }
 }
