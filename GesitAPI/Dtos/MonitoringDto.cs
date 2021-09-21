@@ -16,6 +16,7 @@ namespace GesitAPI.Dtos
         }
         public class DataMonitoring
         {
+            public string StatusProject { get; set; }
             public decimal PercentageCompleted { get; set; }
             public string AIPId { get; set; }
             public string NamaAIP { get; set; }

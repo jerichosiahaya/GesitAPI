@@ -32,8 +32,6 @@ namespace GesitAPI.Controllers
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-            //var json = JsonConvert.SerializeObject(result, Formatting.Indented);
-
             if (result.data.Count <= 0)
                 return NoContent();
             foreach (var item in result.data)
@@ -54,15 +52,24 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
 
                     uncompletedCount = total;
                     completedCount = 9 - uncompletedCount;
                     percentageCompleted = completedCount / 9m;
-
                     item.PercentageCompleted = percentageCompleted;
+
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        item.StatusProject = "Completed";
+                    }
+                    else
+                    {
+                        item.StatusProject = "Uncomplete";
+                    }
 
                 }
                 else
@@ -77,15 +84,24 @@ namespace GesitAPI.Controllers
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
                     && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP" 
+                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
                     uncompletedCount = total;
                     completedCount = 11 - uncompletedCount;
                     percentageCompleted = completedCount / 11m;
-
                     item.PercentageCompleted = percentageCompleted;
+
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        item.StatusProject = "Completed";
+                    }
+                    else
+                    {
+                        item.StatusProject = "Uncomplete";
+                    }
 
                 }
             }
@@ -98,23 +114,38 @@ namespace GesitAPI.Controllers
                         AIPId = x.AIPId,
                         PercentageCompleted = x.PercentageCompleted,
                         NamaAIP = x.NamaAIP,
-                        ProjectId = x.ProjectId
+                        ProjectId = x.ProjectId,
+                        statusAIP = x.statusAIP,
+                        StatusProject = x.StatusProject
                     }).ToList()
-
-                })
-                .ToList();
+                }).ToList();
 
             foreach (var groupItem in groupByDivision)
             {
                 float totalProject = groupItem.Data.Count();
                 float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
                 float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                int totalCompletedProgo = groupItem.Data.Where(x => x.StatusProject is "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+                int totalUncompleteProgo = groupItem.Data.Where(x => x.StatusProject is not "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+
+
+                string statusAIP = groupItem.Data.Select(x => x.statusAIP).ToString();
                 groupItem.CompletedPercentage = totalCompleted / totalProject;
-                groupItem.Completed = Convert.ToInt32(totalCompleted);
-                groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
+                //groupItem.Completed = Convert.ToInt32(totalCompleted);
+                //groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
                 groupItem.TotalProject = Convert.ToInt32(totalProject);
+
+                groupItem.Status.Add(new StatusInfoMonitoring()
+                {
+                    CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                    UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                    CompletedFromProgo = totalCompletedProgo,
+                    UncompleteFromProgo = totalUncompleteProgo
+                });
             }
-            return Ok(groupByDivision);
+
+            var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
+            return Ok(json);
         }
 
         [HttpGet("{kategori}/{divisi}")]
@@ -149,7 +180,8 @@ namespace GesitAPI.Controllers
                     && x.Name != "Squad" && x.Name != "NamaSquad"
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
 
@@ -158,6 +190,15 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 9m;
 
                     item.PercentageCompleted = percentageCompleted;
+
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        item.StatusProject = "Completed";
+                    }
+                    else
+                    {
+                        item.StatusProject = "Uncomplete";
+                    }
 
                 }
                 else
@@ -172,7 +213,8 @@ namespace GesitAPI.Controllers
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
                     && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP")
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
@@ -181,6 +223,15 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 11m;
 
                     item.PercentageCompleted = percentageCompleted;
+
+                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    {
+                        item.StatusProject = "Completed";
+                    }
+                    else
+                    {
+                        item.StatusProject = "Uncomplete";
+                    }
 
                 }
             }
@@ -194,7 +245,9 @@ namespace GesitAPI.Controllers
                         AIPId = x.AIPId,
                         PercentageCompleted = x.PercentageCompleted,
                         NamaAIP = x.NamaAIP,
-                        ProjectId = x.ProjectId
+                        ProjectId = x.ProjectId,
+                        statusAIP = x.statusAIP,
+                        StatusProject = x.StatusProject
                     }).ToList()
 
                 })
@@ -205,12 +258,23 @@ namespace GesitAPI.Controllers
                 float totalProject = groupItem.Data.Count();
                 float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
                 float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                int totalCompletedProgo = groupItem.Data.Where(x => x.StatusProject is "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+                int totalUncompleteProgo = groupItem.Data.Where(x => x.StatusProject is not "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+
                 groupItem.CompletedPercentage = totalCompleted / totalProject;
-                groupItem.Completed = Convert.ToInt32(totalCompleted);
-                groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
+                //groupItem.Completed = Convert.ToInt32(totalCompleted);
+                //groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
                 groupItem.TotalProject = Convert.ToInt32(totalProject);
+                groupItem.Status.Add(new StatusInfoMonitoring()
+                {
+                    CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                    UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                    CompletedFromProgo = totalCompletedProgo,
+                    UncompleteFromProgo = totalUncompleteProgo
+                });
             }
-            return Ok(groupByDivision);
+            var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
+            return Ok(json);
         }
     }
 }

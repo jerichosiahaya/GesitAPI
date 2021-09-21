@@ -53,7 +53,7 @@ namespace GesitAPI.Data
 
         public async Task<IEnumerable<SubRha>> GetByRhaIDandAssign(string idRha, string assign)
         {
-            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha) && s.Assign == assign).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).ThenInclude(o=>o.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha) && s.Assign == assign).AsNoTracking().ToListAsync();
             return result;
         }
 
