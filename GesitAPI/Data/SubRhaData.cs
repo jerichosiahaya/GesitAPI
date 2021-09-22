@@ -1,4 +1,6 @@
-﻿using GesitAPI.Models;
+﻿using AutoMapper;
+using GesitAPI.Dtos;
+using GesitAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,7 +43,8 @@ namespace GesitAPI.Data
 
         public async Task<SubRha> GetById(string id)
         {
-            var result = await _db.SubRhas.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            var result = await _db.SubRhas.Where(s => s.Id == Convert.ToInt32(id)).Include(s=>s.SubRhaevidences).Include(o=>o.TindakLanjuts)
+                .ThenInclude(p=>p.TindakLanjutEvidences).FirstOrDefaultAsync();
             return result;
         }
 

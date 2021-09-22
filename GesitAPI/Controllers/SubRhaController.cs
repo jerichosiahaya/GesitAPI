@@ -1,5 +1,7 @@
-﻿using ExcelDataReader;
+﻿using AutoMapper;
+using ExcelDataReader;
 using GesitAPI.Data;
+using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -36,8 +38,14 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> Get()
         {
             var results = await _subRha.GetAll();
-            var files = results.ToList();
-            return Ok(new { count = files.Count(), data = files });
+
+            //var config = new MapperConfiguration(cfg => {
+            //    cfg.CreateMap<SubRha, SubRhaDto>();
+            //});
+            //IMapper iMapper = config.CreateMapper();
+            //List<SubRhaDto> listSubRhaDto = iMapper.Map<List<SubRha>, List<SubRhaDto>>(results);
+
+            return Ok(new { count = results.Count(), data = results });
         }
 
         // GET api/<SubRhaController>/5
