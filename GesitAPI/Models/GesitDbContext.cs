@@ -91,8 +91,25 @@ namespace GesitAPI.Models
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Tahun).HasColumnName("tahun");
+                
+                entity.Property(e => e.StatusJt)
+                    .HasMaxLength(25)
+                    .HasColumnName("status_jt");
+
+                entity.Property(e => e.DirSekor)
+                    .HasMaxLength(255)
+                    .HasColumnName("dir_sekor");
+
+                entity.Property(e => e.Uic)
+                    .HasMaxLength(255)
+                    .HasColumnName("UIC");
+
+                entity.Property(e => e.StatusTemuan)
+                    .HasMaxLength(25)
+                    .HasColumnName("status_temuan");
+
                 entity.Property(e => e.Assign)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("assign");
 
@@ -122,17 +139,14 @@ namespace GesitAPI.Models
                     .HasColumnName("file_type");
 
                 entity.Property(e => e.Kondisi)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("kondisi");
 
                 entity.Property(e => e.Rekomendasi)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("rekomendasi");
 
                 entity.Property(e => e.SubKondisi)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("sub_kondisi");
 
