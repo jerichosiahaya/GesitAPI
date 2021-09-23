@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]

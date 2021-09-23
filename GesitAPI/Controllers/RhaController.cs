@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RhaController : ControllerBase
@@ -249,11 +249,23 @@ namespace GesitAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Rha rha)
+        public async Task<IActionResult> Put(int id, [FromForm] RhaDto rha)
         {
             try
             {
-                await _rha.Update(id.ToString(), rha);
+                Rha updateData = new Rha();
+                updateData.DirSekor = rha.DirSekor;
+                updateData.Kondisi = rha.Kondisi;
+                updateData.Rekomendasi = rha.Rekomendasi;
+                updateData.StatusJt = rha.StatusJt;
+                updateData.StatusTemuan = rha.StatusTemuan;
+                updateData.SubKondisi = rha.SubKondisi;
+                updateData.Tahun = rha.Tahun;
+                updateData.TargetDate = rha.TargetDate;
+                updateData.Uic = rha.Uic;
+                updateData.Assign = rha.Assign;
+                updateData.CreatedBy = rha.CreatedBy;
+                await _rha.Update(id.ToString(), updateData);
                 return Ok($"Data {rha.Id} berhasil diupdate!");
             }
             catch (Exception ex)

@@ -104,6 +104,12 @@ namespace GesitAPI.Data
                     result.Rekomendasi = obj.Rekomendasi;
                     result.TargetDate = obj.TargetDate;
                     result.Assign = obj.Assign;
+                    result.CreatedBy = obj.CreatedBy;
+                    result.DirSekor = obj.DirSekor;
+                    result.StatusJt = obj.StatusJt;
+                    result.StatusTemuan = obj.StatusTemuan;
+                    result.Uic = obj.Uic;
+                    result.Tahun = obj.Tahun;
                     await _db.SaveChangesAsync();
                 }
                 else

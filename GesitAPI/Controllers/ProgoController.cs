@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class ProgoController : ControllerBase
