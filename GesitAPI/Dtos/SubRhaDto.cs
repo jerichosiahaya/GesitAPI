@@ -13,7 +13,6 @@ namespace GesitAPI.Dtos
             SubRhaevidences = new List<SubRhaevidence>();
             TindakLanjuts = new List<TindakLanjut>();
         }
-
         public int Id { get; set; }
         public int RhaId { get; set; }
         public string DivisiBaru { get; set; }

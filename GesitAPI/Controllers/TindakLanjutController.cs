@@ -1,4 +1,5 @@
 ﻿using GesitAPI.Data;
+using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -49,7 +50,7 @@ namespace GesitAPI.Controllers
         }
 
         [HttpPost(nameof(Upload))]
-        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] TindakLanjut tindakLanjut)
+        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] TindakLanjutDto tindakLanjut)
         {
             var subDirectory1 = "UploadedFiles";
             var subDirectory2 = "TindakLanjut";
@@ -74,8 +75,7 @@ namespace GesitAPI.Controllers
                     return BadRequest(new { status = "Error", message = $"File with extension {rhs} is not allowed", logtime = DateTime.Now });
                 }
                 var filePath = Path.Combine(target, file.FileName);
-                tindakLanjut.FileType = file.ContentType;
-                tindakLanjut.FileSize = file.Length;
+
                 if (System.IO.File.Exists(filePath))
                 {
                     // query for duplicate names to generate counter
@@ -95,26 +95,36 @@ namespace GesitAPI.Controllers
                     // generating new file name
                     var newfileName = String.Format("{0}({1}){2}", Path.GetFileNameWithoutExtension(filePath), value, Path.GetExtension(filePath));
                     var newFilePath = Path.Combine(target, newfileName);
-                    tindakLanjut.FileName = newfileName;
-                    tindakLanjut.FilePath = newFilePath;
+                    TindakLanjut insertData = new TindakLanjut();
+                    insertData.Notes = tindakLanjut.Notes;
+                    insertData.SubRhaId = tindakLanjut.SubRhaId;
+                    insertData.FileName = newfileName;
+                    insertData.FilePath = newFilePath;
+                    insertData.FileType = file.ContentType;
+                    insertData.FileSize = file.Length;
 
                     using (var stream = new FileStream(newFilePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                        await _tindakLanjut.Insert(tindakLanjut);
+                        await _tindakLanjut.Insert(insertData);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", id = tindakLanjut.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
                 else
                 {
-                    tindakLanjut.FileName = file.FileName;
-                    tindakLanjut.FilePath = filePath;
+                    TindakLanjut insertData = new TindakLanjut();
+                    insertData.Notes = tindakLanjut.Notes;
+                    insertData.SubRhaId = tindakLanjut.SubRhaId;
+                    insertData.FileName = file.FileName;
+                    insertData.FilePath = filePath;
+                    insertData.FileType = file.ContentType;
+                    insertData.FileSize = file.Length;
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
-                        await _tindakLanjut.Insert(tindakLanjut);
+                        await _tindakLanjut.Insert(insertData);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", id = tindakLanjut.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
                 }
             }
             catch (DbUpdateException dbEx)

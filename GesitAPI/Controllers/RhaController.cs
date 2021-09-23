@@ -266,7 +266,7 @@ namespace GesitAPI.Controllers
                 updateData.Assign = rha.Assign;
                 updateData.CreatedBy = rha.CreatedBy;
                 await _rha.Update(id.ToString(), updateData);
-                return Ok($"Data {rha.Id} berhasil diupdate!");
+                return Ok($"Data {updateData.Id} berhasil diupdate!");
             }
             catch (Exception ex)
             {
