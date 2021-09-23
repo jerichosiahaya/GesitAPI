@@ -1,5 +1,6 @@
 ﻿using ExcelDataReader;
 using GesitAPI.Data;
+using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RhaController : ControllerBase
@@ -124,7 +125,7 @@ namespace GesitAPI.Controllers
 
         // POST & upload excel
         [HttpPost(nameof(Upload))]
-        public async Task<IActionResult> Upload([Required] IFormFile formFile, [FromForm] Rha rhafile)
+        public async Task<IActionResult> Upload([Required] IFormFile formFile, [FromForm] RhaDto rhafile)
         {
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "Rha";
@@ -150,9 +151,6 @@ namespace GesitAPI.Controllers
                 }
                 var filePath = Path.Combine(target, formFile.FileName);
 
-                rhafile.FileType = formFile.ContentType;
-                rhafile.FileSize = formFile.Length;
-
                 if (System.IO.File.Exists(filePath))
                 {
                     // query for duplicate names to generate counter
@@ -172,26 +170,51 @@ namespace GesitAPI.Controllers
                     // generating new file name
                     var newfileName = String.Format("{0}({1}){2}", Path.GetFileNameWithoutExtension(filePath), value, Path.GetExtension(filePath));
                     var newFilePath = Path.Combine(target, newfileName);
-                    rhafile.FileName = newfileName;
-                    rhafile.FilePath = newFilePath;
+                    Rha insertData = new Rha();
+                    insertData.FileType = formFile.ContentType;
+                    insertData.FileSize = formFile.Length;
+                    insertData.FileName = newfileName;
+                    insertData.FilePath = newFilePath;
+                    insertData.Kondisi = rhafile.Kondisi;
+                    insertData.Rekomendasi = rhafile.Rekomendasi;
+                    insertData.StatusJt = rhafile.StatusJt;
+                    insertData.StatusTemuan = rhafile.StatusTemuan;
+                    insertData.SubKondisi = rhafile.SubKondisi;
+                    insertData.Tahun = rhafile.Tahun;
+                    insertData.TargetDate = rhafile.TargetDate;
+                    insertData.Uic = rhafile.Uic;
+                    insertData.DirSekor = rhafile.DirSekor;
 
                     using (var stream = new FileStream(newFilePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
-                        await _rha.Insert(rhafile);
+                        await _rha.Insert(insertData);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", id = rhafile.Id, file_name = newfileName, file_size = formFile.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = formFile.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
                 else
                 {
-                    rhafile.FileName = formFile.FileName;
-                    rhafile.FilePath = filePath;
+                    Rha insertData = new Rha();
+                    insertData.FileType = formFile.ContentType;
+                    insertData.FileSize = formFile.Length;
+                    insertData.FileName = formFile.FileName;
+                    insertData.FilePath = filePath;
+                    insertData.Kondisi = rhafile.Kondisi;
+                    insertData.Rekomendasi = rhafile.Rekomendasi;
+                    insertData.StatusJt = rhafile.StatusJt;
+                    insertData.StatusTemuan = rhafile.StatusTemuan;
+                    insertData.SubKondisi = rhafile.SubKondisi;
+                    insertData.Tahun = rhafile.Tahun;
+                    insertData.TargetDate = rhafile.TargetDate;
+                    insertData.Uic = rhafile.Uic;
+                    insertData.DirSekor = rhafile.DirSekor;
+
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await formFile.CopyToAsync(stream);
-                        await _rha.Insert(rhafile);
+                        await _rha.Insert(insertData);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", id = rhafile.Id, file_size = formFile.Length, file_path = filePath, logtime = DateTime.Now });
+                    return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = formFile.Length, file_path = filePath, logtime = DateTime.Now });
                 }
             }
             catch (DbUpdateException dbEx)
