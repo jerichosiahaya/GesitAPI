@@ -1,4 +1,6 @@
-﻿using GesitAPI.Data;
+﻿using AutoMapper;
+using GesitAPI.Data;
+using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -24,29 +26,52 @@ namespace GesitAPI.Controllers
 
         // GET: api/<NotificationsController>
         [HttpGet]
-        public async Task<IEnumerable<Notification>> Get()
+        public async Task<IActionResult> Get()
         {
-            //return new string[] { "value1", "value2" };
-            return await _notification.GetAll();
+            // TO DO DIPINDAHKAN KE STARTUP
+            // automapper config
+            var config = new MapperConfiguration(cfg =>
+                    cfg.CreateMap<Notification, NotificationDto>()
+                );
+
+            var result = await _notification.GetAll();
+            var mapper = new Mapper(config);
+            List<NotificationDto> resultData = mapper.Map<List<Notification>, List<NotificationDto>>(result.ToList());
+            return Ok(resultData);
         }
 
         // GET api/<NotificationsController>/5
         [HttpGet("{id}")]
-        public async Task<Notification> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var results = await _notification.GetById(id.ToString());
-            return results;
+            // TO DO DIPINDAHKAN KE STARTUP
+            // automapper config
+            var config = new MapperConfiguration(cfg =>
+                    cfg.CreateMap<Notification, NotificationDto>()
+                );
+
+            var result = await _notification.GetById(id.ToString());
+            var mapper = new Mapper(config);
+            var empDTO = mapper.Map<NotificationDto>(result);
+            return Ok(empDTO);
         }
 
 
         // POST api/<NotificationsController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Notification notification)
+        public async Task<IActionResult> Post([FromForm] NotificationDto.NotificationInsert notification)
         {
             try
             {
-                await _notification.Insert(notification);
-                return Ok($"Data {notification.Id} berhasil ditambahkan!");
+                var config = new MapperConfiguration(cfg =>
+                    cfg.CreateMap<NotificationDto, Notification>()
+                );
+
+                var mapper = new Mapper(config);
+                var insertData = mapper.Map<Notification>(notification);
+
+                await _notification.Insert(insertData);
+                return Ok($"Data {insertData.Id} berhasil ditambahkan!");
             }
             catch (Exception ex)
             {
@@ -66,7 +91,6 @@ namespace GesitAPI.Controllers
             }
             catch (Exception ex)
             {
-
                 throw new Exception(ex.Message);
             }
         }
