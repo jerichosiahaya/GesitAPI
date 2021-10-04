@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static GesitAPI.Dtos.NotificationDto;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -59,7 +60,7 @@ namespace GesitAPI.Controllers
 
         // POST api/<NotificationsController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] NotificationDto.NotificationInsert notification)
+        public async Task<IActionResult> Post([FromForm] NotificationInsert notification)
         {
             try
             {

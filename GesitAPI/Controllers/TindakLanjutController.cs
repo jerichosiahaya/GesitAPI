@@ -32,7 +32,9 @@ namespace GesitAPI.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        List<string> allowedFileExtensions = new List<string>() { "jpg", "png", "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt", "zip", "rar" };
+        List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "doc", "docx", "xls",
+            "xlsx", "pdf", "csv", "txt", "zip", "rar", "JPG", "JPEG", "PNG", "DOC", "DOCX", "XLS",
+            "XLSX", "PDF", "CSV", "TXT", "ZIP", "RAR"  };
 
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -62,7 +64,7 @@ namespace GesitAPI.Controllers
                 {
                     return BadRequest(new { status = "Error", message = "File is empty" });
                 }
-                else if (file.Length > 2000000)
+                else if (file.Length > 6000000)
                 {
                     return BadRequest(new { status = "Error", message = "Maximum file upload exceeded" });
                 }

@@ -35,7 +35,9 @@ namespace GesitAPI.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        List<string> allowedFileExtensions = new List<string>() { "jpg", "png", "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt", "zip", "rar" };
+        List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "doc", "docx", "xls", 
+            "xlsx", "pdf", "csv", "txt", "zip", "rar", "JPG", "JPEG", "PNG", "DOC", "DOCX", "XLS", 
+            "XLSX", "PDF", "CSV", "TXT", "ZIP", "RAR"  };
 
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -137,7 +139,7 @@ namespace GesitAPI.Controllers
                 {
                     return BadRequest(new { status = "Error", message = "File is empty" });
                 }
-                else if (formFile.Length > 2000000)
+                else if (formFile.Length > 6000000)
                 {
                     return BadRequest(new { status = "Error", message = "Maximum file upload exceeded" });
                 }
@@ -170,6 +172,9 @@ namespace GesitAPI.Controllers
                     // generating new file name
                     var newfileName = String.Format("{0}({1}){2}", Path.GetFileNameWithoutExtension(filePath), value, Path.GetExtension(filePath));
                     var newFilePath = Path.Combine(target, newfileName);
+
+                    // TO DO 
+                    // using AutoMapper
                     Rha insertData = new Rha();
                     insertData.FileType = formFile.ContentType;
                     insertData.FileSize = formFile.Length;
@@ -194,6 +199,8 @@ namespace GesitAPI.Controllers
                 }
                 else
                 {
+                    // TO DO 
+                    // using AutoMapper
                     Rha insertData = new Rha();
                     insertData.FileType = formFile.ContentType;
                     insertData.FileSize = formFile.Length;

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SubRhaController : ControllerBase
@@ -143,7 +143,7 @@ namespace GesitAPI.Controllers
                                 rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][9]);
                                 rha.Assign = obj.Rows[i][10].ToString();
                                 rha.RhaId = id;
-                                _db.SubRhas.Add(rha);
+                                await _db.SubRhas.AddAsync(rha);
                             }
                             await _db.SaveChangesAsync();
                             //System.IO.File.Delete(filePath);
