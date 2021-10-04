@@ -219,6 +219,21 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("uic_baru");
 
+                entity.Property(e => e.UicLama)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("uic_lama");
+
+                entity.Property(e => e.UsulClose)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("usul_close");
+
+                entity.Property(e => e.OpenClose)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("open_close");
+
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("updated_at");

@@ -80,7 +80,7 @@ namespace GesitAPI.Controllers
                 {
                     return BadRequest(new { status = "Error", message = "File is empty" });
                 }
-                else if (file.Length > 6000000)
+                else if (file.Length > 10000000)
                 {
                     return BadRequest(new { status = "Error", message = "Maximum file upload exceeded" });
                 }
