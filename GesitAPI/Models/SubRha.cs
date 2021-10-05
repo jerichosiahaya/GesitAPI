@@ -12,7 +12,6 @@ namespace GesitAPI.Models
             SubRhaevidences = new HashSet<SubRhaevidence>();
             TindakLanjuts = new HashSet<TindakLanjut>();
         }
-
         public int Id { get; set; }
         public int RhaId { get; set; }
         public string DivisiBaru { get; set; }
@@ -24,11 +23,12 @@ namespace GesitAPI.Models
         public string Masalah { get; set; }
         public string Pendapat { get; set; }
         public string Status { get; set; }
-        public DateTime JatuhTempo { get; set; }
+        public string StatusJatuhTempo { get; set; }
+        public int JatuhTempo { get; set; } // jatuh tempo = dd
         public int TahunTemuan { get; set; }
         public string Assign { get; set; }
         public string UsulClose { get; set; } // new added
-        public int OpenClose { get; set; } // new added
+        public string OpenClose { get; set; } // new added
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         internal virtual Rha Rha { get; set; }

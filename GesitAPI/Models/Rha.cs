@@ -24,8 +24,7 @@ namespace GesitAPI.Models
         public string FilePath { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public int Tahun { get; set; }
-        public string StatusJt { get; set; }
+        public string StatusJt { get; set; } // jatuh tempo = MM YYYY
         public string DirSekor { get; set; }
         public string Uic { get; set; }
         public string StatusTemuan { get; set; }

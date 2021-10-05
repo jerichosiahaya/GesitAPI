@@ -14,7 +14,6 @@ namespace GesitAPI.Dtos
         public DateTime? TargetDate { get; set; }
         public string Assign { get; set; }
         public string CreatedBy { get; set; }
-        public int Tahun { get; set; }
         public string StatusJt { get; set; }
         public string DirSekor { get; set; }
         public string Uic { get; set; }

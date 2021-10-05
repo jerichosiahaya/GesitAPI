@@ -23,8 +23,9 @@ namespace GesitAPI.Dtos
         public int Nomor { get; set; }
         public string Masalah { get; set; }
         public string Pendapat { get; set; }
+        public string StatusJatuhTempo { get; set; }
         public string Status { get; set; }
-        public DateTime JatuhTempo { get; set; }
+        public int JatuhTempo { get; set; }
         public int TahunTemuan { get; set; }
         public string Assign { get; set; }
         public string UsulClose { get; set; } // new added

@@ -185,9 +185,10 @@ namespace GesitAPI.Controllers
                     insertData.StatusJt = rhafile.StatusJt;
                     insertData.StatusTemuan = rhafile.StatusTemuan;
                     insertData.SubKondisi = rhafile.SubKondisi;
-                    insertData.Tahun = rhafile.Tahun;
                     insertData.TargetDate = rhafile.TargetDate;
                     insertData.Uic = rhafile.Uic;
+                    insertData.Assign = rhafile.Assign;
+                    insertData.CreatedBy = rhafile.CreatedBy;
                     insertData.DirSekor = rhafile.DirSekor;
 
                     using (var stream = new FileStream(newFilePath, FileMode.Create))
@@ -211,7 +212,6 @@ namespace GesitAPI.Controllers
                     insertData.StatusJt = rhafile.StatusJt;
                     insertData.StatusTemuan = rhafile.StatusTemuan;
                     insertData.SubKondisi = rhafile.SubKondisi;
-                    insertData.Tahun = rhafile.Tahun;
                     insertData.TargetDate = rhafile.TargetDate;
                     insertData.Uic = rhafile.Uic;
                     insertData.DirSekor = rhafile.DirSekor;
@@ -267,7 +267,6 @@ namespace GesitAPI.Controllers
                 updateData.StatusJt = rha.StatusJt;
                 updateData.StatusTemuan = rha.StatusTemuan;
                 updateData.SubKondisi = rha.SubKondisi;
-                updateData.Tahun = rha.Tahun;
                 updateData.TargetDate = rha.TargetDate;
                 updateData.Uic = rha.Uic;
                 updateData.Assign = rha.Assign;

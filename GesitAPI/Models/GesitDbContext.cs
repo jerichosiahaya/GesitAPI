@@ -90,11 +90,9 @@ namespace GesitAPI.Models
                 entity.ToTable("RHA");
 
                 entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.Tahun).HasColumnName("tahun");
                 
                 entity.Property(e => e.StatusJt)
-                    .HasMaxLength(25)
+                    .HasMaxLength(255)
                     .HasColumnName("status_jt");
 
                 entity.Property(e => e.DirSekor)
@@ -179,9 +177,12 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("divisi_baru");
 
-                entity.Property(e => e.JatuhTempo)
-                    .HasColumnType("date")
-                    .HasColumnName("jatuh_tempo");
+                entity.Property(e => e.JatuhTempo).HasColumnName("jatuh_tempo");
+
+                entity.Property(e => e.StatusJatuhTempo)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("status_jatuh_tempo");
 
                 entity.Property(e => e.Lokasi)
                     .IsRequired()
@@ -225,7 +226,6 @@ namespace GesitAPI.Models
                     .HasColumnName("uic_lama");
 
                 entity.Property(e => e.UsulClose)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("usul_close");
 

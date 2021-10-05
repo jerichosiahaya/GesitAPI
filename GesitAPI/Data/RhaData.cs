@@ -109,7 +109,6 @@ namespace GesitAPI.Data
                     result.StatusJt = obj.StatusJt;
                     result.StatusTemuan = obj.StatusTemuan;
                     result.Uic = obj.Uic;
-                    result.Tahun = obj.Tahun;
                     await _db.SaveChangesAsync();
                 }
                 else

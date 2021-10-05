@@ -27,10 +27,12 @@ namespace GesitAPI.Controllers
         private IWebHostEnvironment _hostingEnvironment;
         private GesitDbContext _db;
         private ISubRha _subRha;
-        public SubRhaController(GesitDbContext db, ISubRha subRha, IWebHostEnvironment hostingEnvironment)
+        private IRha _rha;
+        public SubRhaController(GesitDbContext db, ISubRha subRha, IRha rha, IWebHostEnvironment hostingEnvironment)
         {
             _db = db;
             _subRha = subRha;
+            _rha = rha;
             _hostingEnvironment = hostingEnvironment;
         }
         // GET: api/<SubRhaController>
@@ -128,9 +130,34 @@ namespace GesitAPI.Controllers
                             if (colCount != 13)
                                 return BadRequest(new { status = false, message = "You're not using the correct template" });
 
+                            // check RHA first
+                            var checkRHA = await _rha.GetById(id.ToString());
+                            if (checkRHA == null)
+                                return BadRequest();
+
+                            var jatuhTempoRHA = checkRHA.StatusJt;
+                            string tes = null;
+                            float compareDate = 0;
                             for (int i = 0; i < objCount; i++)
                             {
+                                var dateNow = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                string tglOnSubRHA = obj.Rows[i][9].ToString();
+                                string mergedTglandJthTempo = tglOnSubRHA + " " +jatuhTempoRHA;
+                                tes = mergedTglandJthTempo;
+
+                                DateTime d1 = DateTime.ParseExact(dateNow, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                DateTime d2 = DateTime.ParseExact(mergedTglandJthTempo, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                compareDate = DateTime.Compare(d1,d2);
+
                                 var rha = new SubRha(); // DI from Models
+
+                                if (compareDate < 0) {
+                                    rha.StatusJatuhTempo = "Belum Jatuh Tempo";
+                                } else
+                                {
+                                    rha.StatusJatuhTempo = "Sudah Jatuh Tempo";
+                                }
+                                   
                                 rha.UicLama = obj.Rows[i][0].ToString();
                                 rha.DivisiBaru = obj.Rows[i][1].ToString();
                                 rha.UicBaru = obj.Rows[i][2].ToString();
@@ -140,16 +167,17 @@ namespace GesitAPI.Controllers
                                 rha.Masalah = obj.Rows[i][6].ToString();
                                 rha.Pendapat = obj.Rows[i][7].ToString();
                                 rha.Status = obj.Rows[i][8].ToString();
-                                rha.JatuhTempo = Convert.ToDateTime(obj.Rows[i][9]);
+                                rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
                                 rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
-                                rha.OpenClose = Convert.ToInt32(obj.Rows[i][11]);
+                                rha.OpenClose = obj.Rows[i][11].ToString();
                                 rha.Assign = obj.Rows[i][12].ToString();
                                 rha.RhaId = id;
                                 _db.SubRhas.Add(rha);
                             }
                             await _db.SaveChangesAsync();
                             //System.IO.File.Delete(filePath);
-                            return Ok(new { status = true, count = objCount, column_count = colCount, sheet_name = sheetName, data = obj });
+                            return Ok(new { status = true, dt_now = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID")), dt_docs = tes,
+                                date_range = compareDate, count = objCount, column_count = colCount, sheet_name = sheetName, data = obj });
                         }
                         catch (DbUpdateException dbEx)
                         {
@@ -165,6 +193,34 @@ namespace GesitAPI.Controllers
                         return NotFound();
                     }
                 }
+            }
+        }
+
+        [HttpPut("UpdateUsulClose/{id}")]
+        public async Task<IActionResult> UpdateUsulClose(string id, string usulClose)
+        {
+            try
+            {
+                var result = await _subRha.GetById(id);
+                if (result != null)
+                {
+                    result.UsulClose = usulClose;
+                    await _db.SaveChangesAsync();
+                    return Ok($"Data {id} successfully updated!");
+                }
+                else
+                {
+                    throw new Exception($"Data {id} not found");
+                }
+            }
+            catch (DbUpdateException DbEx)
+            {
+
+                throw new Exception(DbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }
