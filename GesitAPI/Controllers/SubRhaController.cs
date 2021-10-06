@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SubRhaController : ControllerBase
