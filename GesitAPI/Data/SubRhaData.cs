@@ -67,10 +67,43 @@ namespace GesitAPI.Data
         }
 
         // TBC
-        public Task Update(string id, SubRha obj)
+        public async Task Update(string id, SubRha obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await GetById(id);
+                if (result != null)
+                {
+                    result.DivisiBaru = obj.DivisiBaru;
+                    result.UicLama = obj.UicLama;
+                    result.UicBaru = obj.UicBaru;
+                    result.NamaAudit = obj.NamaAudit;
+                    result.Lokasi = obj.Lokasi;
+                    result.Nomor = obj.Nomor;
+                    result.Masalah = obj.Masalah;
+                    result.Pendapat = obj.Pendapat;
+                    result.Status = obj.Status;
+                    result.JatuhTempo = obj.JatuhTempo;
+                    result.TahunTemuan = obj.TahunTemuan;
+                    result.UsulClose = obj.UsulClose;
+                    result.OpenClose = obj.OpenClose;
+                    await _db.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new Exception($"Data {id} not found");
+                }
+            }
+            catch (DbUpdateException DbEx)
+            {
+
+                throw new Exception(DbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
+    }
 
     }
-}
