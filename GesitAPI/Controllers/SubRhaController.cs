@@ -79,6 +79,35 @@ namespace GesitAPI.Controllers
             return Ok(new { data = results });
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromForm] SubRhaDto subrha)
+        {
+            try
+            {
+                SubRha updateData = new SubRha();
+                updateData.DivisiBaru = subrha.DivisiBaru;
+                updateData.UicLama = subrha.UicLama;
+                updateData.UicBaru = subrha.UicBaru;
+                updateData.NamaAudit = subrha.NamaAudit;
+                updateData.Lokasi = subrha.Lokasi;
+                updateData.Nomor = subrha.Nomor;
+                updateData.Masalah = subrha.Masalah;
+                updateData.Pendapat = subrha.Pendapat;
+                updateData.Status = subrha.Status;
+                updateData.JatuhTempo = subrha.JatuhTempo;
+                updateData.TahunTemuan = subrha.TahunTemuan;
+                updateData.Assign = subrha.Assign;
+                updateData.UsulClose = subrha.UsulClose;
+                await _subRha.Update(id.ToString(), updateData);
+                return Ok($"Data {updateData.Id} berhasil diupdate!");
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         // POST Upload Excel
         // TO DO jatuh_tempo, fix duplicated file names
         [HttpPost(nameof(Upload))]
