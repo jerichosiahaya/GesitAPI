@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,13 +41,6 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> Get()
         {
             var results = await _subRha.GetAll();
-
-            //var config = new MapperConfiguration(cfg => {
-            //    cfg.CreateMap<SubRha, SubRhaDto>();
-            //});
-            //IMapper iMapper = config.CreateMapper();
-            //List<SubRhaDto> listSubRhaDto = iMapper.Map<List<SubRha>, List<SubRhaDto>>(results);
-
             return Ok(new { count = results.Count(), data = results });
         }
 
@@ -151,13 +145,13 @@ namespace GesitAPI.Controllers
                     {
                         try
                         {
-                            var obj = result.Tables[0];
+                            DataTable obj = result.Tables[0];
                             var sheetName = obj.TableName;
                             var objCount = obj.Rows.Count;
                             var colCount = obj.Columns.Count;
 
                             // handling error
-                            if (colCount != 13)
+                            if (colCount != 12)
                                 return BadRequest(new { status = false, message = "You're not using the correct template" });
 
                             // check RHA first
@@ -166,28 +160,38 @@ namespace GesitAPI.Controllers
                                 return BadRequest();
 
                             var jatuhTempoRHA = checkRHA.StatusJt;
-                            string tes = null;
                             float compareDate = 0;
+                            List<SubRha> dataResponse = new List<SubRha>();
                             for (int i = 0; i < objCount; i++)
                             {
+                                // compare date
                                 var dateNow = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
                                 string tglOnSubRHA = obj.Rows[i][9].ToString();
-                                string mergedTglandJthTempo = tglOnSubRHA + " " +jatuhTempoRHA;
-                                tes = mergedTglandJthTempo;
-
+                                string mergedTglandJthTempo = tglOnSubRHA + " " + jatuhTempoRHA;
                                 DateTime d1 = DateTime.ParseExact(dateNow, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
                                 DateTime d2 = DateTime.ParseExact(mergedTglandJthTempo, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
-                                compareDate = DateTime.Compare(d1,d2);
+                                compareDate = DateTime.Compare(d1, d2);
 
-                                var rha = new SubRha(); // DI from Models
-
-                                if (compareDate < 0) {
+                                // generate Jatuh Tempo
+                                var rha = new SubRha();
+                                if (compareDate < 0)
+                                {
                                     rha.StatusJatuhTempo = "Belum Jatuh Tempo";
-                                } else
+                                }
+                                else
                                 {
                                     rha.StatusJatuhTempo = "Sudah Jatuh Tempo";
                                 }
-                                   
+
+                                // default value to Open
+                                //if (obj.Rows[i][11].ToString() == "" || obj.Rows[i][11].ToString() == null)
+                                //{
+                                //    rha.OpenClose = "Open";
+                                //} else
+                                //{
+                                //    rha.OpenClose = obj.Rows[i][11].ToString();
+                                //}
+
                                 rha.UicLama = obj.Rows[i][0].ToString();
                                 rha.DivisiBaru = obj.Rows[i][1].ToString();
                                 rha.UicBaru = obj.Rows[i][2].ToString();
@@ -199,15 +203,24 @@ namespace GesitAPI.Controllers
                                 rha.Status = obj.Rows[i][8].ToString();
                                 rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
                                 rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
-                                rha.OpenClose = obj.Rows[i][11].ToString();
+                                //rha.OpenClose = obj.Rows[i][11].ToString();
                                 rha.Assign = obj.Rows[i][12].ToString();
                                 rha.RhaId = id;
+                                rha.CreatedAt = DateTime.Now;
+                                rha.UpdatedAt = DateTime.Now;
+                                dataResponse.Add(rha);
                                 _db.SubRhas.Add(rha);
                             }
                             await _db.SaveChangesAsync();
-                            //System.IO.File.Delete(filePath);
-                            return Ok(new { status = true, dt_now = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID")), dt_docs = tes,
-                                date_range = compareDate, count = objCount, column_count = colCount, sheet_name = sheetName, data = obj });
+
+                            // automapper
+                            var config = new MapperConfiguration(cfg =>
+                            cfg.CreateMap<SubRha, SubRhaDto>()
+                            );
+                            var mapper = new Mapper(config);
+                            List<SubRhaDto> resultData = mapper.Map<List<SubRha>, List<SubRhaDto>>(dataResponse);
+
+                            return Ok(new { status = true, count = objCount, column_count = colCount, sheet_name = sheetName, data = resultData });
                         }
                         catch (DbUpdateException dbEx)
                         {
@@ -235,6 +248,7 @@ namespace GesitAPI.Controllers
                 if (result != null)
                 {
                     result.UsulClose = usulClose;
+                    result.UpdatedAt = DateTime.Now;
                     await _db.SaveChangesAsync();
                     return Ok($"Data {id} successfully updated!");
                 }

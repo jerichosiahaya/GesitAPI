@@ -92,6 +92,7 @@ namespace GesitAPI.Models
                 entity.Property(e => e.Id).HasColumnName("id");
                 
                 entity.Property(e => e.StatusJt)
+                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("status_jt");
 

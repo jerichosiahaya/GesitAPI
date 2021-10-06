@@ -8,11 +8,6 @@ namespace GesitAPI.Dtos
 {
     public class SubRhaDto
     {
-        public SubRhaDto()
-        {
-            SubRhaevidences = new List<SubRhaevidence>();
-            TindakLanjuts = new List<TindakLanjut>();
-        }
         public int Id { get; set; }
         public int RhaId { get; set; }
         public string DivisiBaru { get; set; }
@@ -32,7 +27,5 @@ namespace GesitAPI.Dtos
         public string OpenClose { get; set; } // new added
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public List<SubRhaevidence> SubRhaevidences { get; set; }
-        public List<TindakLanjut> TindakLanjuts { get; set; }
     }
 }
