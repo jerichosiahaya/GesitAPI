@@ -98,6 +98,7 @@ namespace GesitAPI.Controllers
                 updateData.TahunTemuan = subrha.TahunTemuan;
                 updateData.Assign = subrha.Assign;
                 updateData.UsulClose = subrha.UsulClose;
+                updateData.OpenClose = subrha.OpenClose;
                 await _subRha.Update(id.ToString(), updateData);
                 return Ok($"Data {updateData.Id} berhasil diupdate!");
             }
