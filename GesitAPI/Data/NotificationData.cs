@@ -32,6 +32,12 @@ namespace GesitAPI.Data
             return result;
         }
 
+        public async Task<IEnumerable<Notification>> GetNotificationByProjectId(string projectId)
+        {
+            var result = await _db.Notifications.Where(o => o.ProjectId == projectId).AsNoTracking().ToListAsync();
+            return result;
+        }
+
         public async Task Insert(Notification obj)
         {
             try

@@ -14,7 +14,7 @@ using static GesitAPI.Dtos.NotificationDto;
 
 namespace GesitAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -29,15 +29,23 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            // TO DO DIPINDAHKAN KE STARTUP
-            // automapper config
-            var config = new MapperConfiguration(cfg =>
-                    cfg.CreateMap<Notification, NotificationDto>()
-                );
 
+            List<NotificationView> resultData = new List<NotificationView>();
+            NotificationView tempData = new NotificationView();
             var result = await _notification.GetAll();
-            var mapper = new Mapper(config);
-            List<NotificationDto> resultData = mapper.Map<List<Notification>, List<NotificationDto>>(result.ToList());
+
+            foreach (var o in result)
+            {
+                tempData.Id = o.Id;
+                tempData.ProjectCategory = o.ProjectCategory;
+                tempData.ProjectDocument = o.ProjectDocument;
+                tempData.ProjectId = o.ProjectId;
+                tempData.ProjectTitle = o.ProjectTitle;
+                tempData.Status = o.Status;
+                tempData.TargetDate = o.TargetDate.ToString("yyyy-MM-dd");
+                resultData.Add(tempData);
+            }
+
             return Ok(resultData);
         }
 
@@ -45,16 +53,46 @@ namespace GesitAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            // TO DO DIPINDAHKAN KE STARTUP
-            // automapper config
-            var config = new MapperConfiguration(cfg =>
-                    cfg.CreateMap<Notification, NotificationDto>()
-                );
-
+            NotificationView resultData = new NotificationView();
             var result = await _notification.GetById(id.ToString());
-            var mapper = new Mapper(config);
-            var empDTO = mapper.Map<NotificationDto>(result);
-            return Ok(empDTO);
+
+            resultData.Id = result.Id;
+            resultData.ProjectCategory = result.ProjectCategory;
+            resultData.ProjectDocument = result.ProjectDocument;
+            resultData.ProjectId = result.ProjectId;
+            resultData.ProjectTitle = result.ProjectTitle;
+            resultData.Status = result.Status;
+            resultData.TargetDate = result.TargetDate.ToString("yyyy-MM-dd");
+
+            return Ok(resultData);
+        }
+
+        [HttpGet("GetNotificationByProjectId/{projectId}")]
+        public async Task<IActionResult> GetNotificationByProjectId(string projectId)
+        {
+            var result = await _notification.GetNotificationByProjectId(projectId);
+            if (result == null)
+            {
+                return NotFound();
+            } else
+            {
+                List<NotificationView> resultData = new List<NotificationView>();
+                NotificationView tempData = new NotificationView();
+
+                foreach (var o in result)
+                {
+                    tempData.Id = o.Id;
+                    tempData.ProjectCategory = o.ProjectCategory;
+                    tempData.ProjectDocument = o.ProjectDocument;
+                    tempData.ProjectId = o.ProjectId;
+                    tempData.ProjectTitle = o.ProjectTitle;
+                    tempData.Status = o.Status;
+                    tempData.TargetDate = o.TargetDate.ToString("yyyy-MM-dd");
+                    resultData.Add(tempData);
+                }
+
+                return Ok(resultData);
+            }
         }
 
 
@@ -65,7 +103,7 @@ namespace GesitAPI.Controllers
             try
             {
                 var config = new MapperConfiguration(cfg =>
-                    cfg.CreateMap<NotificationDto, Notification>()
+                    cfg.CreateMap<NotificationInsert, Notification>()
                 );
 
                 var mapper = new Mapper(config);

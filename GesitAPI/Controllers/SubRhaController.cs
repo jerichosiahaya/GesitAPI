@@ -36,6 +36,9 @@ namespace GesitAPI.Controllers
             _rha = rha;
             _hostingEnvironment = hostingEnvironment;
         }
+
+        List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" };
+
         // GET: api/<SubRhaController>
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -76,11 +79,54 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> GetByRhaIDandAssign(string rhaId, string assign)
         {
             var results = await _subRha.GetByRhaIDandAssign(rhaId, assign);
-            return Ok(new { data = results });
+            List<SubRhaViewImageDto> resultData = new List<SubRhaViewImageDto>();
+            SubRhaViewImageDto tempData = new SubRhaViewImageDto();
+
+            foreach (var o in results)
+            {
+                tempData.Id = o.Id;
+                tempData.RhaId = o.RhaId;
+                tempData.DivisiBaru = o.DivisiBaru;
+                tempData.UicBaru = o.UicBaru;
+                tempData.NamaAudit = o.NamaAudit;
+                tempData.Lokasi = o.Lokasi;
+                tempData.Nomor = o.Nomor;
+                tempData.Masalah = o.Masalah;
+                tempData.Pendapat = o.Pendapat;
+                tempData.Status = o.Status;
+                tempData.JatuhTempo = o.JatuhTempo;
+                tempData.TahunTemuan = o.TahunTemuan;
+                tempData.Assign = o.Assign;
+                tempData.UicLama = o.UicLama;
+                tempData.OpenClose = o.OpenClose;
+                tempData.UsulClose = o.UsulClose;
+                tempData.StatusJatuhTempo = o.StatusJatuhTempo;
+                tempData.SubRhaevidences = o.SubRhaevidences;
+                tempData.TindakLanjuts = o.TindakLanjuts;
+
+                foreach (var i in o.SubRhaimages)
+                {
+                    SubRhaImageDto vData = new SubRhaImageDto();
+                    string base64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(i.FilePath));
+                    vData.Id = i.Id;
+                    vData.FileName = i.FileName;
+                    vData.FileSize = i.FileSize;
+                    vData.FileType = i.FileType;
+                    vData.CreatedAt = i.CreatedAt;
+                    vData.ViewImage = "data:" + i.FileType + ";base64, " + base64;
+                    tempData.SubRhaImages.Add(vData);
+                }
+
+                resultData.Add(tempData);
+            }
+
+            return Ok(resultData);
+
+            //return Ok(new { data = results });
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] SubRhaDto subrha)
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] SubRhaDto subrha)
         {
             try
             {
@@ -99,8 +145,8 @@ namespace GesitAPI.Controllers
                 updateData.Assign = subrha.Assign;
                 updateData.UsulClose = subrha.UsulClose;
                 updateData.OpenClose = subrha.OpenClose;
-                await _subRha.Update(id.ToString(), updateData);
-                return Ok($"Data {updateData.Id} berhasil diupdate!");
+                await _subRha.Update(subrha.Id.ToString(), updateData);
+                return Ok($"Data {subrha.Id} berhasil diupdate!");
             }
             catch (Exception ex)
             {
@@ -208,6 +254,7 @@ namespace GesitAPI.Controllers
                                 rha.RhaId = id;
                                 rha.CreatedAt = DateTime.Now;
                                 rha.UpdatedAt = DateTime.Now;
+                                rha.OpenClose = "Open";
                                 dataResponse.Add(rha);
                                 _db.SubRhas.Add(rha);
                             }
@@ -267,5 +314,14 @@ namespace GesitAPI.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
+        // TO DO
+        // Update status_jatuh_tempo secara otomatis, buat controllernya dulu
+        // hitung progress RHA
+
+
+        
+
+
     }
 }

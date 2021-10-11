@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GesitAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,12 @@ namespace GesitAPI.Dtos
 {
     public class RhaDto
     {
-        internal int Id { get; set; }
+        public RhaDto()
+        {
+            StatusInfo = new List<StatusInfoRha>();
+        }
+
+        public int Id { get; set; }
         public string SubKondisi { get; set; }
         public string Kondisi { get; set; }
         public string Rekomendasi { get; set; }
@@ -18,5 +24,16 @@ namespace GesitAPI.Dtos
         public string DirSekor { get; set; }
         public string Uic { get; set; }
         public string StatusTemuan { get; set; }
+        public List<StatusInfoRha> StatusInfo { get; set; }
+
+        public class StatusInfoRha
+        {
+            public int CountSubRha { get; set; }
+            public int CountSubRHAClosed { get; set; }
+            public int CountSubRHAOpen { get; set; }
+            public float StatusCompletedPercentage { get; set; }
+
+        }
+
     }
 }

@@ -31,7 +31,7 @@ namespace GesitAPI.Data
 
         public async Task<IEnumerable<SubRha>> GetAll()
         {
-            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).Include(p=>p.SubRhaimages).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
             return result;
         }
 
@@ -43,20 +43,20 @@ namespace GesitAPI.Data
 
         public async Task<SubRha> GetById(string id)
         {
-            var result = await _db.SubRhas.Where(s => s.Id == Convert.ToInt32(id)).Include(s=>s.SubRhaevidences).Include(o=>o.TindakLanjuts)
+            var result = await _db.SubRhas.Where(s => s.Id == Convert.ToInt32(id)).Include(s=>s.SubRhaevidences).Include(p => p.SubRhaimages).Include(o=>o.TindakLanjuts)
                 .ThenInclude(p=>p.TindakLanjutEvidences).FirstOrDefaultAsync();
             return result;
         }
 
         public async Task<IEnumerable<SubRha>> GetByRhaID(string idRha)
         {
-            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).ThenInclude(p=>p.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
             return result;
         }
 
         public async Task<IEnumerable<SubRha>> GetByRhaIDandAssign(string idRha, string assign)
         {
-            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).ThenInclude(o=>o.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha) && s.Assign == assign).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(p=>p.SubRhaimages).Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).ThenInclude(o=>o.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha) && s.Assign == assign).AsNoTracking().ToListAsync();
             return result;
         }
 
@@ -106,4 +106,4 @@ namespace GesitAPI.Data
         }
     }
 
-    }
+}

@@ -20,18 +20,19 @@ namespace GesitAPI.Models
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Rha> Rhas { get; set; }
         public virtual DbSet<SubRha> SubRhas { get; set; }
+        public virtual DbSet<SubRhaimage> SubRhaimages { get; set; }
         public virtual DbSet<SubRhaevidence> SubRhaevidences { get; set; }
         public virtual DbSet<TindakLanjut> TindakLanjuts { get; set; }
         public virtual DbSet<TindakLanjutEvidence> TindakLanjutEvidences { get; set; }
 
-//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//        {
-//            if (!optionsBuilder.IsConfigured)
-//            {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//                optionsBuilder.UseSqlServer("Data Source=35.219.8.90;Initial Catalog=GesitDb;Persist Security Info=True;User ID=sa;Password=bni46SQL");
-//            }
-//        }
+        //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //        {
+        //            if (!optionsBuilder.IsConfigured)
+        //            {
+        //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        //                optionsBuilder.UseSqlServer("Data Source=35.219.8.90;Initial Catalog=GesitDb;Persist Security Info=True;User ID=sa;Password=bni46SQL");
+        //            }
+        //        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -90,7 +91,7 @@ namespace GesitAPI.Models
                 entity.ToTable("RHA");
 
                 entity.Property(e => e.Id).HasColumnName("id");
-                
+
                 entity.Property(e => e.StatusJt)
                     .IsRequired()
                     .HasMaxLength(255)
@@ -244,6 +245,46 @@ namespace GesitAPI.Models
                     .HasForeignKey(d => d.RhaId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__SubRHA__rha_id__18EBB532");
+            });
+
+            // new added
+            modelBuilder.Entity<SubRhaimage>(entity =>
+            {
+                entity.ToTable("SubRHAImage");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
+                entity.Property(e => e.FileName)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_name");
+
+                entity.Property(e => e.FilePath)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_path");
+
+                entity.Property(e => e.FileSize).HasColumnName("file_size");
+
+                entity.Property(e => e.FileType)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .HasColumnName("file_type");
+
+                entity.Property(e => e.SubRhaId).HasColumnName("sub_rha_id");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("updated_at");
+
+                entity.HasOne(d => d.SubRha)
+                    .WithMany(p => p.SubRhaimages)
+                    .HasForeignKey(d => d.SubRhaId)
+                    .HasConstraintName("FK__SubRHAIma__sub_r__09746778");
             });
 
             modelBuilder.Entity<SubRhaevidence>(entity =>

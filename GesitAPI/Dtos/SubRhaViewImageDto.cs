@@ -1,17 +1,18 @@
-﻿using System;
+﻿using GesitAPI.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-#nullable disable
-
-namespace GesitAPI.Models
+namespace GesitAPI.Dtos
 {
-    public partial class SubRha
+    public class SubRhaViewImageDto
     {
-        public SubRha()
+        public SubRhaViewImageDto()
         {
             SubRhaevidences = new HashSet<SubRhaevidence>();
-            SubRhaimages = new HashSet<SubRhaimage>();
             TindakLanjuts = new HashSet<TindakLanjut>();
+            SubRhaImages = new List<SubRhaImageDto>();
         }
 
         public int Id { get; set; }
@@ -27,15 +28,13 @@ namespace GesitAPI.Models
         public int JatuhTempo { get; set; }
         public int? TahunTemuan { get; set; }
         public string Assign { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
         public string UicLama { get; set; }
         public string OpenClose { get; set; }
         public string UsulClose { get; set; }
         public string StatusJatuhTempo { get; set; }
-        internal virtual Rha Rha { get; set; }
+        public List<SubRhaImageDto> SubRhaImages { get; set; }
         public virtual ICollection<SubRhaevidence> SubRhaevidences { get; set; }
-        public virtual ICollection<SubRhaimage> SubRhaimages { get; set; }
         public virtual ICollection<TindakLanjut> TindakLanjuts { get; set; }
+
     }
 }

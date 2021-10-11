@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Data
 {
-    public interface INotification : ICrud<Notification>
+    public interface ISubRhaImage : ICrud<SubRhaimage>
     {
-        Task<IEnumerable<Notification>> GetNotificationByProjectId(string projectId);
+        Task<IEnumerable<SubRhaimage>> CountExistingFileNameSubRhaImage(string filename);
     }
 }

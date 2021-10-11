@@ -17,7 +17,7 @@ using static GesitAPI.Dtos.ResponseMonitoring;
 
 namespace GesitAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MonitoringController : ControllerBase

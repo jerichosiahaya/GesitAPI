@@ -1,4 +1,5 @@
-﻿using ExcelDataReader;
+﻿using AutoMapper;
+using ExcelDataReader;
 using GesitAPI.Data;
 using GesitAPI.Dtos;
 using GesitAPI.Models;
@@ -43,8 +44,44 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> Get()
         {
             var results = await _rha.GetAll();
-            var files = results.ToList();
-            return Ok(new { count = files.Count(), data = files });
+            List<RhaDto> resultData = new List<RhaDto>();
+            RhaDto tempData = new RhaDto();
+
+            foreach (var o in results)
+            {
+                var countSubRha = o.SubRhas.Count;
+                var countSubRhaOpen = o.SubRhas.Where(p => p.OpenClose == "Open").Count();
+                var countSubRhaClosed = o.SubRhas.Where(p => p.OpenClose == "Closed").Count();
+                float completedPercentage = (float)countSubRhaOpen / (float)countSubRha;
+
+                tempData.Id = o.Id;
+                tempData.Kondisi = o.Kondisi;
+                tempData.Rekomendasi = o.Rekomendasi;
+                tempData.SubKondisi = o.SubKondisi;
+                tempData.TargetDate = o.TargetDate;
+                tempData.Assign = o.Assign;
+                tempData.CreatedBy = o.CreatedBy;
+                tempData.StatusJt = o.StatusJt;
+                tempData.DirSekor = o.DirSekor;
+                tempData.Uic = o.Uic;
+                tempData.StatusTemuan = o.StatusTemuan;
+
+                tempData.StatusInfo.Add(new RhaDto.StatusInfoRha { 
+                
+                    CountSubRha = countSubRha,
+                    CountSubRHAClosed = countSubRhaClosed,
+                    CountSubRHAOpen = countSubRhaOpen,
+                    StatusCompletedPercentage = completedPercentage
+                   
+                
+                });
+                //tempData.SubRhas = o.SubRhas;
+                resultData.Add(tempData);
+            }
+
+            return Ok(resultData);
+            //var files = results.ToList();
+            //return Ok(new { count = files.Count(), data = files });
         }
 
         [HttpGet("{id}")]
@@ -280,6 +317,7 @@ namespace GesitAPI.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
 
         // POST & Read Excel content
         //[HttpPost(nameof(UploadExcel))]

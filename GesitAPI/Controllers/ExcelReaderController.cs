@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 
 namespace GesitAPI.Controllers
 {
-    //[ApiExplorerSettings(IgnoreApi = true)]
-    //[Authorize]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ExcelReaderController : ControllerBase
