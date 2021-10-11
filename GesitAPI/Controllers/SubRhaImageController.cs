@@ -130,18 +130,20 @@ namespace GesitAPI.Controllers
         public IActionResult ViewImage([Required] int subRhaId)
         {
             var result = _db.SubRhaimages.Where(o => o.SubRhaId == subRhaId).ToList();
-            SubRhaImageDto tempData = new SubRhaImageDto();
             List<SubRhaImageDto> resultData = new List<SubRhaImageDto>();
+            
             foreach (var o in result)
             {
                 string base64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(o.FilePath));
-                tempData.Id = o.Id;
-                tempData.FileName = o.FileName;
-                tempData.FileSize = o.FileSize;
-                tempData.FileType = o.FileType;
-                tempData.ViewImage = "data:" + o.FileType + ";base64, " + base64;
-                tempData.CreatedAt = o.CreatedAt;
-                resultData.Add(tempData);
+                resultData.Add(new SubRhaImageDto
+                {
+                    Id = o.Id,
+                    FileName = o.FileName,
+                    FileSize = o.FileSize,
+                    FileType = o.FileType,
+                    ViewImage = "data:" + o.FileType + ";base64, " + base64,
+                    CreatedAt = o.CreatedAt
+                });
             }
 
             return Ok(resultData);

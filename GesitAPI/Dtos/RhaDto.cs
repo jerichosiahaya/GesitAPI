@@ -14,6 +14,7 @@ namespace GesitAPI.Dtos
         }
 
         public int Id { get; set; }
+        public string FileName { get; set; }
         public string SubKondisi { get; set; }
         public string Kondisi { get; set; }
         public string Rekomendasi { get; set; }

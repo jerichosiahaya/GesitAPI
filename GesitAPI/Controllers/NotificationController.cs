@@ -36,14 +36,24 @@ namespace GesitAPI.Controllers
 
             foreach (var o in result)
             {
-                tempData.Id = o.Id;
-                tempData.ProjectCategory = o.ProjectCategory;
-                tempData.ProjectDocument = o.ProjectDocument;
-                tempData.ProjectId = o.ProjectId;
-                tempData.ProjectTitle = o.ProjectTitle;
-                tempData.Status = o.Status;
-                tempData.TargetDate = o.TargetDate.ToString("yyyy-MM-dd");
-                resultData.Add(tempData);
+                //tempData.Id = o.Id;
+                //tempData.ProjectCategory = o.ProjectCategory;
+                //tempData.ProjectDocument = o.ProjectDocument;
+                //tempData.ProjectId = o.ProjectId;
+                //tempData.ProjectTitle = o.ProjectTitle;
+                //tempData.Status = o.Status;
+                //tempData.TargetDate = o.TargetDate.ToString("yyyy-MM-dd");
+
+                resultData.Add(new NotificationView
+                {
+                    Id = o.Id,
+                    ProjectCategory = o.ProjectCategory,
+                    ProjectDocument = o.ProjectDocument,
+                    ProjectId = o.ProjectId,
+                    ProjectTitle = o.ProjectTitle,
+                    Status = o.Status,
+                    TargetDate = o.TargetDate.ToString("yyyy-MM-dd")
+                });
             }
 
             return Ok(resultData);
@@ -81,14 +91,16 @@ namespace GesitAPI.Controllers
 
                 foreach (var o in result)
                 {
-                    tempData.Id = o.Id;
-                    tempData.ProjectCategory = o.ProjectCategory;
-                    tempData.ProjectDocument = o.ProjectDocument;
-                    tempData.ProjectId = o.ProjectId;
-                    tempData.ProjectTitle = o.ProjectTitle;
-                    tempData.Status = o.Status;
-                    tempData.TargetDate = o.TargetDate.ToString("yyyy-MM-dd");
-                    resultData.Add(tempData);
+                    resultData.Add(new NotificationView
+                    {
+                        Id = o.Id,
+                        ProjectCategory = o.ProjectCategory,
+                        ProjectDocument = o.ProjectDocument,
+                        ProjectId = o.ProjectId,
+                        ProjectTitle = o.ProjectTitle,
+                        Status = o.Status,
+                        TargetDate = o.TargetDate.ToString("yyyy-MM-dd")
+                    });
                 }
 
                 return Ok(resultData);
@@ -98,7 +110,7 @@ namespace GesitAPI.Controllers
 
         // POST api/<NotificationsController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] NotificationInsert notification)
+        public async Task<IActionResult> Post([FromBody] NotificationInsert notification)
         {
             try
             {

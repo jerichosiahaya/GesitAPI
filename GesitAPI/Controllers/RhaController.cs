@@ -14,6 +14,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static GesitAPI.Dtos.RhaDto;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -45,7 +46,6 @@ namespace GesitAPI.Controllers
         {
             var results = await _rha.GetAll();
             List<RhaDto> resultData = new List<RhaDto>();
-            RhaDto tempData = new RhaDto();
 
             foreach (var o in results)
             {
@@ -54,34 +54,34 @@ namespace GesitAPI.Controllers
                 var countSubRhaClosed = o.SubRhas.Where(p => p.OpenClose == "Closed").Count();
                 float completedPercentage = (float)countSubRhaOpen / (float)countSubRha;
 
-                tempData.Id = o.Id;
-                tempData.Kondisi = o.Kondisi;
-                tempData.Rekomendasi = o.Rekomendasi;
-                tempData.SubKondisi = o.SubKondisi;
-                tempData.TargetDate = o.TargetDate;
-                tempData.Assign = o.Assign;
-                tempData.CreatedBy = o.CreatedBy;
-                tempData.StatusJt = o.StatusJt;
-                tempData.DirSekor = o.DirSekor;
-                tempData.Uic = o.Uic;
-                tempData.StatusTemuan = o.StatusTemuan;
-
-                tempData.StatusInfo.Add(new RhaDto.StatusInfoRha { 
-                
-                    CountSubRha = countSubRha,
-                    CountSubRHAClosed = countSubRhaClosed,
-                    CountSubRHAOpen = countSubRhaOpen,
-                    StatusCompletedPercentage = completedPercentage
-                   
-                
+                resultData.Add(new RhaDto
+                {
+                    Id = o.Id,
+                    FileName = o.FileName,
+                    Kondisi = o.Kondisi,
+                    Rekomendasi = o.Rekomendasi,
+                    SubKondisi = o.SubKondisi,
+                    TargetDate = o.TargetDate,
+                    Assign = o.Assign,
+                    CreatedBy = o.CreatedBy,
+                    StatusJt = o.StatusJt,
+                    DirSekor = o.DirSekor,
+                    Uic = o.Uic,
+                    StatusTemuan = o.StatusTemuan,
+                    StatusInfo = new List<StatusInfoRha>()
+                    {
+                        new StatusInfoRha()
+                        {
+                            CountSubRha = countSubRha,
+                            CountSubRHAClosed = countSubRhaClosed,
+                            CountSubRHAOpen = countSubRhaOpen,
+                            StatusCompletedPercentage = completedPercentage
+                        }
+                    }
+                    
                 });
-                //tempData.SubRhas = o.SubRhas;
-                resultData.Add(tempData);
             }
-
             return Ok(resultData);
-            //var files = results.ToList();
-            //return Ok(new { count = files.Count(), data = files });
         }
 
         [HttpGet("{id}")]

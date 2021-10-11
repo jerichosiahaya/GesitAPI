@@ -79,50 +79,47 @@ namespace GesitAPI.Controllers
         public async Task<IActionResult> GetByRhaIDandAssign(string rhaId, string assign)
         {
             var results = await _subRha.GetByRhaIDandAssign(rhaId, assign);
-            List<SubRhaViewImageDto> resultData = new List<SubRhaViewImageDto>();
-            SubRhaViewImageDto tempData = new SubRhaViewImageDto();
+            //List<SubRhaViewImageDto> resultData = new List<SubRhaViewImageDto>();
+            //SubRhaViewImageDto tempData = new SubRhaViewImageDto();
+            //foreach (var o in results)
+            //{
+            //    tempData.Id = o.Id;
+            //    tempData.RhaId = o.RhaId;
+            //    tempData.DivisiBaru = o.DivisiBaru;
+            //    tempData.UicBaru = o.UicBaru;
+            //    tempData.NamaAudit = o.NamaAudit;
+            //    tempData.Lokasi = o.Lokasi;
+            //    tempData.Nomor = o.Nomor;
+            //    tempData.Masalah = o.Masalah;
+            //    tempData.Pendapat = o.Pendapat;
+            //    tempData.Status = o.Status;
+            //    tempData.JatuhTempo = o.JatuhTempo;
+            //    tempData.TahunTemuan = o.TahunTemuan;
+            //    tempData.Assign = o.Assign;
+            //    tempData.UicLama = o.UicLama;
+            //    tempData.OpenClose = o.OpenClose;
+            //    tempData.UsulClose = o.UsulClose;
+            //    tempData.StatusJatuhTempo = o.StatusJatuhTempo;
+            //    tempData.SubRhaevidences = o.SubRhaevidences;
+            //    tempData.TindakLanjuts = o.TindakLanjuts;
 
-            foreach (var o in results)
-            {
-                tempData.Id = o.Id;
-                tempData.RhaId = o.RhaId;
-                tempData.DivisiBaru = o.DivisiBaru;
-                tempData.UicBaru = o.UicBaru;
-                tempData.NamaAudit = o.NamaAudit;
-                tempData.Lokasi = o.Lokasi;
-                tempData.Nomor = o.Nomor;
-                tempData.Masalah = o.Masalah;
-                tempData.Pendapat = o.Pendapat;
-                tempData.Status = o.Status;
-                tempData.JatuhTempo = o.JatuhTempo;
-                tempData.TahunTemuan = o.TahunTemuan;
-                tempData.Assign = o.Assign;
-                tempData.UicLama = o.UicLama;
-                tempData.OpenClose = o.OpenClose;
-                tempData.UsulClose = o.UsulClose;
-                tempData.StatusJatuhTempo = o.StatusJatuhTempo;
-                tempData.SubRhaevidences = o.SubRhaevidences;
-                tempData.TindakLanjuts = o.TindakLanjuts;
+            //    foreach (var i in o.SubRhaimages)
+            //    {
+            //        SubRhaImageDto vData = new SubRhaImageDto();
+            //        string base64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(i.FilePath));
+            //        vData.Id = i.Id;
+            //        vData.FileName = i.FileName;
+            //        vData.FileSize = i.FileSize;
+            //        vData.FileType = i.FileType;
+            //        vData.CreatedAt = i.CreatedAt;
+            //        vData.ViewImage = "data:" + i.FileType + ";base64, " + base64;
+            //        tempData.SubRhaImages.Add(vData);
+            //    }
+            //    resultData.Add(tempData);
+            //}
+            //return Ok(resultData);
 
-                foreach (var i in o.SubRhaimages)
-                {
-                    SubRhaImageDto vData = new SubRhaImageDto();
-                    string base64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(i.FilePath));
-                    vData.Id = i.Id;
-                    vData.FileName = i.FileName;
-                    vData.FileSize = i.FileSize;
-                    vData.FileType = i.FileType;
-                    vData.CreatedAt = i.CreatedAt;
-                    vData.ViewImage = "data:" + i.FileType + ";base64, " + base64;
-                    tempData.SubRhaImages.Add(vData);
-                }
-
-                resultData.Add(tempData);
-            }
-
-            return Ok(resultData);
-
-            //return Ok(new { data = results });
+            return Ok(new { data = results });
         }
 
         [HttpPut]
