@@ -35,6 +35,12 @@ namespace GesitAPI.Data
             return result;
         }
 
+        public async Task<IEnumerable<SubRha>> GetAllTracking()
+        {
+            var result = await _db.SubRhas.OrderByDescending(s => s.CreatedAt).ToListAsync();
+            return result;
+        }
+
         public async Task<IEnumerable<SubRha>> GetByAssign(string assign)
         {
             var result = await _db.SubRhas.Where(s => s.Assign == assign).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
@@ -50,7 +56,7 @@ namespace GesitAPI.Data
 
         public async Task<IEnumerable<SubRha>> GetByRhaID(string idRha)
         {
-            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(c => c.TindakLanjuts).ThenInclude(p=>p.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Include(e => e.SubRhaevidences).Include(i=>i.SubRhaimages).Include(c => c.TindakLanjuts).ThenInclude(p=>p.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).Where(s => s.RhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();
             return result;
         }
 

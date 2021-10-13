@@ -26,14 +26,16 @@ namespace GesitAPI.Data
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<SubRhaimage>> GetAll()
+        public async Task<IEnumerable<SubRhaimage>> GetAll()
         {
-            throw new NotImplementedException();
+            var results = await _db.SubRhaimages.OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            return results;
         }
 
-        public Task<SubRhaimage> GetById(string id)
+        public async Task<SubRhaimage> GetById(string id)
         {
-            throw new NotImplementedException();
+            var result = await _db.SubRhaimages.Where(p => p.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            return result;
         }
 
         public async Task Insert(SubRhaimage obj)

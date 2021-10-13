@@ -29,10 +29,12 @@ namespace GesitAPI.Controllers
         private GesitDbContext _db;
         private ISubRha _subRha;
         private IRha _rha;
-        public SubRhaController(GesitDbContext db, ISubRha subRha, IRha rha, IWebHostEnvironment hostingEnvironment)
+        private ISubRhaImage _subRhaImage;
+        public SubRhaController(GesitDbContext db, ISubRha subRha, IRha rha, ISubRhaImage subRhaImage, IWebHostEnvironment hostingEnvironment)
         {
             _db = db;
             _subRha = subRha;
+            _subRhaImage = subRhaImage;
             _rha = rha;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -74,52 +76,53 @@ namespace GesitAPI.Controllers
             return Ok(new { data = results });
         }
 
+        // TO DO
+        // PERBAIKI DTO SUBRHAEVIDENCES DAN TINDAKLANJUTS
         // GET sub rha by rha id and assign
         [HttpGet("GetByRhaIDandAssign/{rhaId}/{assign}")]
         public async Task<IActionResult> GetByRhaIDandAssign(string rhaId, string assign)
         {
             var results = await _subRha.GetByRhaIDandAssign(rhaId, assign);
-            //List<SubRhaViewImageDto> resultData = new List<SubRhaViewImageDto>();
-            //SubRhaViewImageDto tempData = new SubRhaViewImageDto();
-            //foreach (var o in results)
-            //{
-            //    tempData.Id = o.Id;
-            //    tempData.RhaId = o.RhaId;
-            //    tempData.DivisiBaru = o.DivisiBaru;
-            //    tempData.UicBaru = o.UicBaru;
-            //    tempData.NamaAudit = o.NamaAudit;
-            //    tempData.Lokasi = o.Lokasi;
-            //    tempData.Nomor = o.Nomor;
-            //    tempData.Masalah = o.Masalah;
-            //    tempData.Pendapat = o.Pendapat;
-            //    tempData.Status = o.Status;
-            //    tempData.JatuhTempo = o.JatuhTempo;
-            //    tempData.TahunTemuan = o.TahunTemuan;
-            //    tempData.Assign = o.Assign;
-            //    tempData.UicLama = o.UicLama;
-            //    tempData.OpenClose = o.OpenClose;
-            //    tempData.UsulClose = o.UsulClose;
-            //    tempData.StatusJatuhTempo = o.StatusJatuhTempo;
-            //    tempData.SubRhaevidences = o.SubRhaevidences;
-            //    tempData.TindakLanjuts = o.TindakLanjuts;
+            List<SubRhaViewImageDto> resultData = new List<SubRhaViewImageDto>();
+            string webPath = "http://35.219.8.90:90/";
+            var viewLInk = webPath + "api/SubRhaImage/GetById/";
+            foreach (var o in results)
+            {
+                SubRhaViewImageDto tempData = new SubRhaViewImageDto();
+                tempData.Id = o.Id;
+                tempData.RhaId = o.RhaId;
+                tempData.DivisiBaru = o.DivisiBaru;
+                tempData.UicBaru = o.UicBaru;
+                tempData.NamaAudit = o.NamaAudit;
+                tempData.Lokasi = o.Lokasi;
+                tempData.Nomor = o.Nomor;
+                tempData.Masalah = o.Masalah;
+                tempData.Pendapat = o.Pendapat;
+                tempData.Status = o.Status;
+                tempData.JatuhTempo = o.JatuhTempo;
+                tempData.TahunTemuan = o.TahunTemuan;
+                tempData.Assign = o.Assign;
+                tempData.UicLama = o.UicLama;
+                tempData.OpenClose = o.OpenClose;
+                tempData.UsulClose = o.UsulClose;
+                tempData.StatusJatuhTempo = o.StatusJatuhTempo;
+                //tempData.SubRhaevidences = o.SubRhaevidences;
+                //tempData.TindakLanjuts = o.TindakLanjuts;
 
-            //    foreach (var i in o.SubRhaimages)
-            //    {
-            //        SubRhaImageDto vData = new SubRhaImageDto();
-            //        string base64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(i.FilePath));
-            //        vData.Id = i.Id;
-            //        vData.FileName = i.FileName;
-            //        vData.FileSize = i.FileSize;
-            //        vData.FileType = i.FileType;
-            //        vData.CreatedAt = i.CreatedAt;
-            //        vData.ViewImage = "data:" + i.FileType + ";base64, " + base64;
-            //        tempData.SubRhaImages.Add(vData);
-            //    }
-            //    resultData.Add(tempData);
-            //}
-            //return Ok(resultData);
-
-            return Ok(new { data = results });
+                foreach (var i in o.SubRhaimages)
+                {
+                    SubRhaImageDto vData = new SubRhaImageDto();
+                    vData.Id = i.Id;
+                    vData.FileName = i.FileName;
+                    vData.FileSize = i.FileSize;
+                    vData.FileType = i.FileType;
+                    vData.CreatedAt = i.CreatedAt;
+                    vData.ViewImage = viewLInk + i.Id;
+                    tempData.SubRhaImages.Add(vData);
+                }
+                resultData.Add(tempData);
+            }
+            return Ok(resultData);
         }
 
         [HttpPut]
@@ -155,7 +158,7 @@ namespace GesitAPI.Controllers
         // POST Upload Excel
         // TO DO jatuh_tempo, fix duplicated file names
         [HttpPost(nameof(Upload))]
-        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] int id)
+        public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] int rhaId)
         {
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "SubRha";
@@ -193,12 +196,13 @@ namespace GesitAPI.Controllers
                             var objCount = obj.Rows.Count;
                             var colCount = obj.Columns.Count;
 
+                            // sementara di-comment karena ada hidden di file excel
                             // handling error
-                            if (colCount != 12)
-                                return BadRequest(new { status = false, message = "You're not using the correct template" });
+                            //if (colCount != 12)
+                            //    return BadRequest(new { status = false, message = "You're not using the correct template" });
 
                             // check RHA first
-                            var checkRHA = await _rha.GetById(id.ToString());
+                            var checkRHA = await _rha.GetById(rhaId.ToString());
                             if (checkRHA == null)
                                 return BadRequest();
 
@@ -247,11 +251,11 @@ namespace GesitAPI.Controllers
                                 rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
                                 rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
                                 //rha.OpenClose = obj.Rows[i][11].ToString();
-                                rha.Assign = obj.Rows[i][12].ToString();
-                                rha.RhaId = id;
+                                rha.Assign = obj.Rows[i][11].ToString();
+                                rha.RhaId = rhaId;
                                 rha.CreatedAt = DateTime.Now;
                                 rha.UpdatedAt = DateTime.Now;
-                                rha.OpenClose = "Open";
+                                rha.OpenClose = "Open"; // auto open
                                 dataResponse.Add(rha);
                                 _db.SubRhas.Add(rha);
                             }
@@ -312,13 +316,71 @@ namespace GesitAPI.Controllers
             }
         }
 
-        // TO DO
-        // Update status_jatuh_tempo secara otomatis, buat controllernya dulu
-        // hitung progress RHA
+        [HttpPut(nameof(UpdateStatusJatuhTempo))]
+        public async Task<IActionResult> UpdateStatusJatuhTempo()
+        {
+            try {
+                var subRhaGetAll = await _subRha.GetAllTracking();
+                var dateNow = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                int compareDate = 0;
+                foreach (var o in subRhaGetAll)
+                {
+                    var rhaGetById = await _rha.GetById(o.RhaId.ToString());
+                    var jatuhTempoRha = rhaGetById.StatusJt;
+                    var jatuhTempoSubRha = o.JatuhTempo.ToString();
+                    var jatuhTempoMerged = jatuhTempoSubRha + " " + jatuhTempoRha;
+                    DateTime d1 = DateTime.ParseExact(dateNow, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                    DateTime d2 = DateTime.ParseExact(jatuhTempoMerged, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                    compareDate = DateTime.Compare(d1, d2);
+                    if (compareDate < 0)
+                    {
+                        o.StatusJatuhTempo = "Belum Jatuh Tempo";
+                    }
+                    else
+                    {
+                        o.StatusJatuhTempo = "Sudah Jatuh Tempo";
+                    }  
+                }
+                await _db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception(dbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
+        [HttpPut(nameof(UpdateStatusJatuhTempoBySubRha))]
+        public async Task<IActionResult> UpdateStatusJatuhTempoBySubRha(int SubRhaId)
+        {
+            var subRha = await _subRha.GetById(SubRhaId.ToString());
+            var rhaGetById = await _rha.GetById(subRha.RhaId.ToString());
+            var dateNow = DateTime.Today.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+            int compareDate = 0;
 
-        
+            var jatuhTempoRha = rhaGetById.StatusJt;
+            var jatuhTempoSubRha = subRha.JatuhTempo.ToString();
+            var jatuhTempoMerged = jatuhTempoSubRha + " " + jatuhTempoRha;
+            DateTime d1 = DateTime.ParseExact(dateNow, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+            DateTime d2 = DateTime.ParseExact(jatuhTempoMerged, "dd MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+            compareDate = DateTime.Compare(d1, d2);
 
+            if (compareDate < 0)
+            {
+                subRha.StatusJatuhTempo = "Belum Jatuh Tempo";
+            }
+            else
+            {
+                subRha.StatusJatuhTempo = "Sudah Jatuh Tempo";
+            }
 
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

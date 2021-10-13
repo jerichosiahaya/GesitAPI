@@ -52,7 +52,7 @@ namespace GesitAPI.Controllers
                 var countSubRha = o.SubRhas.Count;
                 var countSubRhaOpen = o.SubRhas.Where(p => p.OpenClose == "Open").Count();
                 var countSubRhaClosed = o.SubRhas.Where(p => p.OpenClose == "Closed").Count();
-                float completedPercentage = (float)countSubRhaOpen / (float)countSubRha;
+                float completedPercentage = (float)countSubRhaClosed / (float)countSubRha;
 
                 resultData.Add(new RhaDto
                 {
@@ -117,7 +117,43 @@ namespace GesitAPI.Controllers
                 //             .Distinct();
 
                 var result = _rha.GetSubRHAByAssign(assign);
-                return Ok(new { data = result });
+                List<RhaDto> resultData = new List<RhaDto>();
+
+                foreach (var o in result)
+                {
+                    var subRhaData = _db.SubRhas.Where(p => p.RhaId == o.Id).ToList(); //  && p.Assign == assign
+                    var countSubRha = subRhaData.Count;
+                    var countSubRhaOpen = subRhaData.Where(o => o.OpenClose == "Open").Count();
+                    var countSubRhaClosed = subRhaData.Where(p => p.OpenClose == "Closed").Count();
+                    float completedPercentage = (float)countSubRhaOpen / (float)countSubRha;
+
+                    resultData.Add(new RhaDto
+                    {
+                        Id = o.Id,
+                        FileName = o.FileName,
+                        Kondisi = o.Kondisi,
+                        Rekomendasi = o.Rekomendasi,
+                        SubKondisi = o.SubKondisi,
+                        TargetDate = o.TargetDate,
+                        Assign = o.Assign,
+                        CreatedBy = o.CreatedBy,
+                        StatusJt = o.StatusJt,
+                        DirSekor = o.DirSekor,
+                        Uic = o.Uic,
+                        StatusTemuan = o.StatusTemuan,
+                        StatusInfo = new List<StatusInfoRha>()
+                        {
+                            new StatusInfoRha()
+                            {
+                                CountSubRha = countSubRha,
+                                CountSubRHAClosed = countSubRhaClosed,
+                                CountSubRHAOpen = countSubRhaOpen,
+                                StatusCompletedPercentage = completedPercentage
+                            }
+                        }
+                    });
+                }
+                return Ok(resultData);
             }
         }
 

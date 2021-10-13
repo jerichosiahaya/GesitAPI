@@ -149,5 +149,38 @@ namespace GesitAPI.Controllers
             return Ok(resultData);
         }
 
+        [AllowAnonymous]
+        [HttpGet("GetById/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _subRhaImage.GetById(id.ToString());
+            var imageType = result.FileType;
+            var imagePath = result.FilePath;
+            Byte[] contentImage = System.IO.File.ReadAllBytes(imagePath);
+            return File(contentImage, imageType);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var results = await _subRhaImage.GetAll();
+            List<SubRhaImageDto> resultsData = new List<SubRhaImageDto>();
+            string webPath = "http://35.219.8.90:90/";
+            var viewLInk = webPath + "api/SubRhaImage/GetById/";
+            foreach (var o in results)
+            {
+                resultsData.Add(new SubRhaImageDto
+                {
+                    Id = o.Id,
+                    FileName = o.FileName,
+                    FileType = o.FileType,
+                    FileSize = o.FileSize,
+                    CreatedAt = o.CreatedAt,
+                    ViewImage = viewLInk + o.Id
+                });
+            }
+            return Ok(resultsData);
+        }
+
     }
 }

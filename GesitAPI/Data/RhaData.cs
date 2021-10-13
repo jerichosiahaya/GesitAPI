@@ -49,10 +49,9 @@ namespace GesitAPI.Data
             // ThenInclude(c => c.InputTlfilesEvidences). kalau mau tambah tindak lanjut evidences
             return result;
         }
-
         public async Task<Rha> GetById(string id)
         {
-            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id)).Include(c => c.SubRhas).FirstOrDefaultAsync();
+            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id)).Include(c => c.SubRhas).ThenInclude(b=>b.SubRhaimages).FirstOrDefaultAsync();
             return result;
         }
 

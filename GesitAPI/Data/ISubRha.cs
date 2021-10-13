@@ -8,6 +8,7 @@ namespace GesitAPI.Data
 {
     public interface ISubRha : ICrud<SubRha>
     {
+        Task<IEnumerable<SubRha>> GetAllTracking();
         Task<IEnumerable<SubRha>> GetByRhaID(string idRha);
         Task<IEnumerable<SubRha>> CountExistingFileNameSubRha(string filename);
         Task<IEnumerable<SubRha>> GetByAssign(string assign);
