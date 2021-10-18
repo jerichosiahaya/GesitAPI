@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -55,6 +56,17 @@ namespace GesitAPI
             });
 
             services.AddDbContext<GesitDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ServerConnection")));
+
+            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireDigit = true;
+            }).AddDefaultTokenProviders().AddEntityFrameworkStores<GesitDbContext>();
+
+            
 
             // Authorization features on Swagger section
             services.AddSwaggerGen(swagger =>
@@ -115,6 +127,7 @@ namespace GesitAPI
             services.AddScoped<ITindakLanjutEvidence, TindakLanjutEvidenceData>();
             services.AddScoped<ISubRhaImage, SubRhaImageData>();
             services.AddScoped<INotification, NotificationData>();
+            services.AddScoped<IUser, UserData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
