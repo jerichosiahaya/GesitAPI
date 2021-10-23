@@ -41,12 +41,14 @@ namespace GesitAPI.Controllers
 
         // upload image
         [HttpPost(nameof(UploadImage))]
-        public async Task<IActionResult> UploadImage([Required] IFormFile image, [FromForm] int id)
+        public async Task<IActionResult> UploadImage([Required] IFormFile image, [FromForm] int subRhaId)
         {
             SubRhaimage subRhaImage = new SubRhaimage();
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "SubRhaImages";
             var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
+            string webPath = "http://35.219.8.90:90/";
+            var viewLInk = webPath + "api/SubRhaImage/GetById/";
             Directory.CreateDirectory(target);
             try
             {
@@ -70,7 +72,7 @@ namespace GesitAPI.Controllers
 
                 subRhaImage.FileType = image.ContentType;
                 subRhaImage.FileSize = image.Length;
-                subRhaImage.SubRhaId = id;
+                subRhaImage.SubRhaId = subRhaId;
 
                 subRhaImage.CreatedAt = DateTime.Now;
                 subRhaImage.UpdatedAt = DateTime.Now;
@@ -102,7 +104,17 @@ namespace GesitAPI.Controllers
                         await image.CopyToAsync(stream);
                         await _subRhaImage.Insert(subRhaImage); // todo
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", file_name = newfileName, file_size = image.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+
+                    // new dto to return the response
+                    SubRhaImageDto responseData = new SubRhaImageDto();
+                    responseData.Id = subRhaImage.Id;
+                    responseData.FileName = image.FileName;
+                    responseData.FileSize = image.Length;
+                    responseData.FileType = image.ContentType;
+                    responseData.CreatedAt = DateTime.Now;
+                    responseData.ViewImage = viewLInk + subRhaImage.Id;
+
+                    return Ok(new { status = "Success", message = "File successfully uploaded", data = responseData, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
                 else
                 {
@@ -113,7 +125,17 @@ namespace GesitAPI.Controllers
                         await image.CopyToAsync(stream);
                         await _subRhaImage.Insert(subRhaImage);
                     }
-                    return Ok(new { status = "Success", message = "File successfully uploaded", file_size = image.Length, file_path = filePath, logtime = DateTime.Now });
+
+                    // new dto to return the response
+                    SubRhaImageDto responseData = new SubRhaImageDto();
+                    responseData.Id = subRhaImage.Id;
+                    responseData.FileName = image.FileName;
+                    responseData.FileSize = image.Length;
+                    responseData.FileType = image.ContentType;
+                    responseData.CreatedAt = DateTime.Now;
+                    responseData.ViewImage = viewLInk + subRhaImage.Id;
+
+                    return Ok(new { status = "Success", message = "File successfully uploaded", data = responseData, logtime = DateTime.Now });
                 }
             }
             catch (DbUpdateException dbEx)

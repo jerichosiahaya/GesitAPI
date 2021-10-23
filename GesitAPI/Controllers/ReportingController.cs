@@ -1,6 +1,7 @@
 ﻿using GesitAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -20,10 +21,17 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class ReportingController : ControllerBase
     {
-
+        private readonly IConfiguration _config;
+        public ReportingController(IConfiguration config)
+        {
+            _config = config;
+        }
         [HttpGet("{kategori}")]
         public IActionResult RPTI(string kategori)
         {
+            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+
             var client = new RestClient("http://35.219.107.102/");
             client.UseNewtonsoftJson();
             var request = new RestRequest("progodev/api/project?kategori="+kategori);

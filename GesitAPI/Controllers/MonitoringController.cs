@@ -1,6 +1,7 @@
 ﻿using GesitAPI.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -17,18 +18,27 @@ using static GesitAPI.Dtos.ResponseMonitoring;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MonitoringController : ControllerBase
     {
+        private readonly IConfiguration _config;
+        public MonitoringController(IConfiguration config)
+        {
+            _config = config;
+        }
+
         [HttpGet("{kategori}")]
         public IActionResult MonitoringGovernanceProject(string kategori)
         {
-            var client = new RestClient("http://35.219.107.102/");
+            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+
+            var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
             var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", "progo123");
+            request.AddHeader("progo-key", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
@@ -150,10 +160,13 @@ namespace GesitAPI.Controllers
         [HttpGet("{kategori}/{divisi}")]
         public IActionResult MonitoringGovernanceProjectByDivisi(string kategori, string divisi)
         {
-            var client = new RestClient("http://35.219.107.102/");
+            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+
+            var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
             var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", "progo123");
+            request.AddHeader("progo-key", apiKey);
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
@@ -278,10 +291,13 @@ namespace GesitAPI.Controllers
         [HttpGet("StatusAll/{kategori}")]
         public IActionResult StatusAll(string kategori)
         {
-            var client = new RestClient("http://35.219.107.102/");
+            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+
+            var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
             var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", "progo123");
+            request.AddHeader("progo-key", apiKey);
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 

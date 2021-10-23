@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace GesitAPI.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ExcelReaderController : ControllerBase
@@ -55,24 +55,18 @@ namespace GesitAPI.Controllers
                     };
 
                     var result = reader.AsDataSet(conf);
-                    //result.Tables
+
                     if (result != null)
                     {
-                        //var json = Newtonsoft.Json.JsonConvert.SerializeObject(result.Tables[0], Newtonsoft.Json.Formatting.Indented);
                         var obj = result.Tables[0];
                         var sheetName = obj.TableName;
                         var objCount = obj.Rows.Count;
-                        //var obj = System.Text.Json.JsonSerializer.Serialize(result.Tables);
-                        //JObject jsonResult = JObject.Parse(json);
-                        //var tableList = obj.ToList();
                         return Ok(new { status = true, count = objCount, sheet_name = sheetName, data = obj.Rows });
                     }
                     else
                     {
                         return NotFound();
                     }
-                    // The result of each spreadsheet is in result.Tables
-                    //testt
                 }
             }
         }

@@ -10,8 +10,8 @@ namespace GesitAPI.Dtos
     {
         public SubRhaViewImageDto()
         {
-            SubRhaevidences = new HashSet<SubRhaevidence>();
-            TindakLanjuts = new HashSet<TindakLanjut>();
+            SubRhaevidences = new List<SubRhaEvidenceDto>();
+            TindakLanjuts = new List<TindakLanjutDto>();
             SubRhaImages = new List<SubRhaImageDto>();
         }
 
@@ -33,8 +33,8 @@ namespace GesitAPI.Dtos
         public string UsulClose { get; set; }
         public string StatusJatuhTempo { get; set; }
         public List<SubRhaImageDto> SubRhaImages { get; set; }
-        public virtual ICollection<SubRhaevidence> SubRhaevidences { get; set; }
-        public virtual ICollection<TindakLanjut> TindakLanjuts { get; set; }
+        public virtual List<SubRhaEvidenceDto> SubRhaevidences { get; set; }
+        public virtual List<TindakLanjutDto> TindakLanjuts { get; set; }
 
     }
 }

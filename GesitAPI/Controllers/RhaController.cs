@@ -78,10 +78,76 @@ namespace GesitAPI.Controllers
                             StatusCompletedPercentage = completedPercentage
                         }
                     }
-                    
                 });
             }
             return Ok(resultData);
+        }
+
+        // to do: pindahkan ke folder dto
+        public class ResponseStatusRha
+        {
+            public int CountRha { get; set; }
+            public int CompletedRha { get; set; }
+            public int UncompleteRha { get; set; }
+            public float PercentageCompletedRha { get; set; }
+            public float PercentageUncompleteRha { get; set; }
+        }
+
+        [HttpGet(nameof(GetStatusRha))]
+        public async Task<IActionResult> GetStatusRha()
+        {
+            var results = await _rha.GetAll();
+            List<RhaDto> resultData = new List<RhaDto>();
+
+            foreach (var o in results)
+            {
+                var countSubRha = o.SubRhas.Count;
+                var countSubRhaOpen = o.SubRhas.Where(p => p.OpenClose == "Open").Count();
+                var countSubRhaClosed = o.SubRhas.Where(p => p.OpenClose == "Closed").Count();
+                float completedPercentage = (float)countSubRhaClosed / (float)countSubRha;
+
+                resultData.Add(new RhaDto
+                {
+                    Id = o.Id,
+                    FileName = o.FileName,
+                    Kondisi = o.Kondisi,
+                    Rekomendasi = o.Rekomendasi,
+                    SubKondisi = o.SubKondisi,
+                    TargetDate = o.TargetDate,
+                    Assign = o.Assign,
+                    CreatedBy = o.CreatedBy,
+                    StatusJt = o.StatusJt,
+                    DirSekor = o.DirSekor,
+                    Uic = o.Uic,
+                    StatusTemuan = o.StatusTemuan,
+                    StatusInfo = new List<StatusInfoRha>()
+                    {
+                        new StatusInfoRha()
+                        {
+                            CountSubRha = countSubRha,
+                            CountSubRHAClosed = countSubRhaClosed,
+                            CountSubRHAOpen = countSubRhaOpen,
+                            StatusCompletedPercentage = completedPercentage
+                        }
+                    }
+                });
+            }
+
+            
+            var countRha = resultData.Count();
+            var completedRha = resultData.Where(p => p.StatusInfo.Any(o => o.StatusCompletedPercentage == 100)).Count();
+            float resultPercentageCompleted = (float)completedRha / (float)countRha;
+            ResponseStatusRha responseData = new ResponseStatusRha()
+            {
+                CountRha = countRha,
+                CompletedRha = completedRha,
+                UncompleteRha = countRha - completedRha,
+                PercentageCompletedRha = resultPercentageCompleted,
+                PercentageUncompleteRha = 100-resultPercentageCompleted
+            };
+
+            return Ok(responseData);
+
         }
 
         [HttpGet("{id}")]
