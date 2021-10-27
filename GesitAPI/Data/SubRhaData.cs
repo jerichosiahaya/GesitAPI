@@ -92,6 +92,7 @@ namespace GesitAPI.Data
                     result.JatuhTempo = obj.JatuhTempo;
                     result.TahunTemuan = obj.TahunTemuan;
                     result.UsulClose = obj.UsulClose;
+                    result.Assign = obj.Assign;
                     result.OpenClose = obj.OpenClose;
                     await _db.SaveChangesAsync();
                 }

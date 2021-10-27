@@ -21,17 +21,9 @@ namespace GesitAPI.Data
             throw new NotImplementedException();
         }
 
-        public async Task Registration(User user)
+        public Task Registration(User user)
         {
-            try
-            {
-                var _user = new IdentityUser { UserName = user.npp, Email = user.name };
-                var result = await _userManager.CreateAsync(_user, user.password);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            throw new NotImplementedException();
         }
 
     }

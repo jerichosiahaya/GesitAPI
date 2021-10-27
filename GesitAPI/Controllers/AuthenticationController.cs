@@ -30,13 +30,23 @@ namespace GesitAPI.Controllers
             _appSettings = appSettings.Value;
         }
 
-        private List<User> _users = new List<User>
+        public class UserPrivate
         {
-            new User { id = 1, npp = "P02020", email = "captainamerica@bni.com", name = "Steve Rogers", role = "GOV", password = "avengers" },
-            new User { id = 2, npp = "P02021", email = "admin@bni.com", name = "Admin", role = "ADMIN", password = "Admin123" },
-            new User { id = 3, npp = "P02022", email = "batman@bni.com", name = "Bruce Wayne", role = "PIC", password = "gotham" },
-            new User { id = 4, npp = "P02023", email = "superman@bni.com", name = "Clark Kent", role = "MANAGEMENT", password = "metropolis" },
-            new User { id = 5, npp = "P02024", email = "johndoe@bni.com", name = "John Doe", role = "PM", password = "johndoe123" }
+            public int id { get; set; }
+            public string npp { get; set; }
+            public string name { get; set; }
+            public string email { get; set; }
+            public string role { get; set; }
+            public string password { get; set; }
+        }
+
+        private List<UserPrivate> _users = new List<UserPrivate>
+        {
+            new UserPrivate { id = 1, npp = "P02020", email = "captainamerica@bni.com", name = "Steve Rogers", role = "GOV", password = "avengers" },
+            new UserPrivate { id = 2, npp = "P02021", email = "admin@bni.com", name = "Admin", role = "ADMIN", password = "Admin123" },
+            new UserPrivate { id = 3, npp = "P02022", email = "batman@bni.com", name = "Bruce Wayne", role = "PIC", password = "gotham" },
+            new UserPrivate { id = 4, npp = "P02023", email = "superman@bni.com", name = "Clark Kent", role = "MANAGEMENT", password = "metropolis" },
+            new UserPrivate { id = 5, npp = "P02024", email = "johndoe@bni.com", name = "John Doe", role = "PM", password = "johndoe123" }
         };
 
         // GET: api/<AuthenticationController>
@@ -58,7 +68,7 @@ namespace GesitAPI.Controllers
             return Ok(new { status = "Success", data = userData });
         }
 
-        private string generateJwtToken(User user)
+        private string generateJwtToken(UserPrivate user)
         {
             // generate token that is valid for 7 days
             var tokenHandler = new JwtSecurityTokenHandler();

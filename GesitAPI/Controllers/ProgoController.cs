@@ -35,20 +35,6 @@ namespace GesitAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("DocumentanddetailsMap")]
-        public IEnumerable<DocumentanddetailsMap> GetDocumentanddetailsMap()
-        {
-            var rng = new Random();
-            //populate data WeatherForecast dengan random number 
-            var DocumentanddetailsEnum = Enumerable.Range(1, 5).Select(index => new Documentanddetails
-            {
-                created_at = DateTime.Now.AddDays(index),
-            });
-            //mapping data WeatherRoom dari WeatherForeCast
-            var DocumentanddetailsMap = _mapper.Map<IEnumerable<DocumentanddetailsMap>>(DocumentanddetailsEnum);
-            return DocumentanddetailsMap;
-        }
-
         // json serialize settings
         // use this settings to change the format of the json output
         JsonSerializerSettings DefaultSettings = new JsonSerializerSettings
