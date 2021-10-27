@@ -19,7 +19,7 @@ namespace GesitAPI.Models
 
         public virtual DbSet<Checklist> Checklists { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<ProgoDokuman> ProgoDokumen { get; set; }
+        public virtual DbSet<ProgoDocument> ProgoDocuments { get; set; }
         public virtual DbSet<ProgoProject> ProgoProjects { get; set; }
         public virtual DbSet<Rha> Rhas { get; set; }
         public virtual DbSet<SubRha> SubRhas { get; set; }
@@ -179,8 +179,10 @@ namespace GesitAPI.Models
                     .HasColumnName("updated_at");
             });
 
-            modelBuilder.Entity<ProgoDokuman>(entity =>
+            modelBuilder.Entity<ProgoDocument>(entity =>
             {
+                entity.ToTable("ProgoDocument");
+
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AipId)
@@ -200,15 +202,15 @@ namespace GesitAPI.Models
                     .HasColumnName("url_download_file");
 
                 entity.HasOne(d => d.Aip)
-                    .WithMany(p => p.ProgoDokumen)
+                    .WithMany(p => p.ProgoDocuments)
                     .HasForeignKey(d => d.AipId)
-                    .HasConstraintName("FK__ProgoDoku__aip_i__22401542");
+                    .HasConstraintName("FK__ProgoDocu__aip_i__2704CA5F");
             });
 
             modelBuilder.Entity<ProgoProject>(entity =>
             {
                 entity.HasKey(e => e.AipId)
-                    .HasName("PK__ProgoPro__2977E191D6BF9EFF");
+                    .HasName("PK__ProgoPro__2977E19143EF68E6");
 
                 entity.ToTable("ProgoProject");
 
@@ -381,7 +383,6 @@ namespace GesitAPI.Models
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Assign)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("assign");
 
@@ -390,43 +391,36 @@ namespace GesitAPI.Models
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.DivisiBaru)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("divisi_baru");
 
                 entity.Property(e => e.JatuhTempo).HasColumnName("jatuh_tempo");
 
                 entity.Property(e => e.Lokasi)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("lokasi");
 
                 entity.Property(e => e.Masalah)
-                    .IsRequired()
                     .HasColumnType("text")
                     .HasColumnName("masalah");
 
                 entity.Property(e => e.NamaAudit)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("nama_audit");
 
                 entity.Property(e => e.Nomor).HasColumnName("nomor");
 
                 entity.Property(e => e.OpenClose)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("open_close");
 
                 entity.Property(e => e.Pendapat)
-                    .IsRequired()
                     .HasColumnType("text")
                     .HasColumnName("pendapat");
 
                 entity.Property(e => e.RhaId).HasColumnName("rha_id");
 
                 entity.Property(e => e.Status)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("status");
 
@@ -437,12 +431,10 @@ namespace GesitAPI.Models
                 entity.Property(e => e.TahunTemuan).HasColumnName("tahun_temuan");
 
                 entity.Property(e => e.UicBaru)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("uic_baru");
 
                 entity.Property(e => e.UicLama)
-                    .IsRequired()
                     .HasMaxLength(255)
                     .HasColumnName("uic_lama");
 

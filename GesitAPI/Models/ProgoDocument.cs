@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace GesitAPI.Models
 {
-    public partial class ProgoDokuman
+    public partial class ProgoDocument
     {
         public int Id { get; set; }
         public string AipId { get; set; }

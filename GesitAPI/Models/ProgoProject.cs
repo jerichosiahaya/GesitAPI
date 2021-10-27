@@ -9,7 +9,7 @@ namespace GesitAPI.Models
     {
         public ProgoProject()
         {
-            ProgoDokumen = new HashSet<ProgoDokuman>();
+            ProgoDocuments = new HashSet<ProgoDocument>();
         }
 
         public string AipId { get; set; }
@@ -39,6 +39,6 @@ namespace GesitAPI.Models
         public long? EstimasiBiayaOpex { get; set; }
         public string StatusAip { get; set; }
 
-        public virtual ICollection<ProgoDokuman> ProgoDokumen { get; set; }
+        public virtual ICollection<ProgoDocument> ProgoDocuments { get; set; }
     }
 }

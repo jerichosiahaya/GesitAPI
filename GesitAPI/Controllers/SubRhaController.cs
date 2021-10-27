@@ -287,12 +287,21 @@ namespace GesitAPI.Controllers
                                 rha.UicBaru = obj.Rows[i][2].ToString();
                                 rha.NamaAudit = obj.Rows[i][3].ToString();
                                 rha.Lokasi = obj.Rows[i][4].ToString();
-                                rha.Nomor = Convert.ToInt32(obj.Rows[i][5]);
+
+                                if (obj.Rows[i][5].ToString() != "")
+                                    rha.Nomor = Convert.ToInt32(obj.Rows[i][5]);
+                                    
                                 rha.Masalah = obj.Rows[i][6].ToString();
                                 rha.Pendapat = obj.Rows[i][7].ToString();
                                 rha.Status = obj.Rows[i][8].ToString();
-                                rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
-                                rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
+
+                                if (obj.Rows[i][9].ToString() != "")
+                                    rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
+                                    
+                                if (obj.Rows[i][10].ToString() != "")
+                                    rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
+                                    
+                                
                                 //rha.OpenClose = obj.Rows[i][11].ToString();
                                 rha.Assign = obj.Rows[i][11].ToString();
                                 rha.RhaId = rhaId;

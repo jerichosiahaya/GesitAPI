@@ -4,11 +4,16 @@ using GesitAPI.Dtos;
 using GesitAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static GesitAPI.Dtos.NotificationDto;
+using static GesitAPI.Dtos.ProgoProjectDto;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,10 +24,14 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
+        private readonly IConfiguration _config;
         private INotification _notification;
-        public NotificationController(INotification notification)
+        private GesitDbContext _db;
+        public NotificationController(INotification notification, IConfiguration config, GesitDbContext db)
         {
             _notification = notification;
+            _config = config;
+            _db = db;
         }
 
         // GET: api/<NotificationsController>
@@ -107,7 +116,6 @@ namespace GesitAPI.Controllers
             }
         }
 
-
         // POST api/<NotificationsController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] NotificationInsert notification)
@@ -144,6 +152,93 @@ namespace GesitAPI.Controllers
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        // PROGO UPDATE
+        [HttpGet(nameof(UpdateStatusNotification))]
+        public async Task<IActionResult> UpdateStatusNotification()
+        {
+            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+
+            var client = new RestClient(requestUrl);
+            client.UseNewtonsoftJson();
+            var request = new RestRequest("progodev/api/project?kategori=RBB");
+            request.AddHeader("progo-key", apiKey);
+            var response = client.Execute(request);
+            var result = JsonConvert.DeserializeObject<Root>(response.Content);
+            if (result.data.Count <= 0)
+                return NoContent();
+            
+            foreach (var o in result.data)
+            {
+                ProgoProject progoProject = new ProgoProject();
+                // check the aip id
+                var countCheckAIP = _db.ProgoProjects.Where(p => p.AipId == o.AIPId).Count();
+                // insert if empty
+                if (countCheckAIP == 0)
+                {
+                    progoProject.AipId = o.AIPId;
+                    progoProject.NamaAip = o.NamaAIP;
+                    progoProject.ProjectId = o.ProjectId;
+                    progoProject.NamaProject = o.NamaProject;
+                    progoProject.ProjectBudget = Convert.ToInt32(o.ProjectBudget);
+                    progoProject.ProjectDemandValue = Convert.ToInt64(o.ProjectDemandValue);
+                    progoProject.StrategicImportance = o.StrategicImportance;
+                    progoProject.Durasi = Convert.ToInt32(o.Durasi);
+                    progoProject.EksImplementasi = o.EksImplementasi;
+                    progoProject.Divisi = o.Divisi;
+                    //progoProject.Lob = o.LOB;
+                    progoProject.NamaLob = o.NamaLOB;
+                    progoProject.Squad = o.Squad;
+                    progoProject.NamaSquad = o.NamaSquad;
+                    progoProject.TahunCreate = Convert.ToInt32(o.TahunCreate);
+                    progoProject.PeriodeAip = Convert.ToInt32(o.PeriodeAIP);
+                    progoProject.AplikasiTerdampak = o.AplikasiTerdampak;
+                    progoProject.ProjectCategory = o.ProjectCategory;
+                    progoProject.JenisPengembangan = o.JenisPengembangan;
+                    progoProject.Pengembang = o.Pengembang;
+                    progoProject.PpjtiPihakTerkait = o.PPJTIPihakTerkait;
+                    progoProject.LokasiDc = o.LokasiDC;
+                    progoProject.LokasiDrc = o.LokasiDRC;
+                    progoProject.EstimasiBiayaCapex = Convert.ToInt32(o.EstimasiBiayaCapex);
+                    progoProject.EstimasiBiayaOpex = Convert.ToInt32(o.EstimasiBiayaOpex);
+                    progoProject.StatusAip = o.statusAIP;
+                    _db.ProgoProjects.Add(progoProject);
+                } else if (countCheckAIP == 1) { // update if exists
+                    var dataProject = _db.ProgoProjects.Where(p => p.AipId == o.AIPId).FirstOrDefault();
+                    dataProject.NamaAip = o.NamaAIP;
+                    dataProject.ProjectId = o.ProjectId;
+                    dataProject.NamaProject = o.NamaProject;
+                    dataProject.ProjectBudget = Convert.ToInt32(o.ProjectBudget);
+                    dataProject.ProjectDemandValue = Convert.ToInt64(o.ProjectDemandValue);
+                    dataProject.StrategicImportance = o.StrategicImportance;
+                    dataProject.Durasi = Convert.ToInt32(o.Durasi);
+                    dataProject.EksImplementasi = o.EksImplementasi;
+                    dataProject.Divisi = o.Divisi;
+                    //dataProject.Lob = o.LOB;
+                    dataProject.NamaLob = o.NamaLOB;
+                    dataProject.Squad = o.Squad;
+                    dataProject.NamaSquad = o.NamaSquad;
+                    dataProject.TahunCreate = Convert.ToInt32(o.TahunCreate);
+                    dataProject.PeriodeAip = Convert.ToInt32(o.PeriodeAIP);
+                    dataProject.AplikasiTerdampak = o.AplikasiTerdampak;
+                    dataProject.ProjectCategory = o.ProjectCategory;
+                    dataProject.JenisPengembangan = o.JenisPengembangan;
+                    dataProject.Pengembang = o.Pengembang;
+                    dataProject.PpjtiPihakTerkait = o.PPJTIPihakTerkait;
+                    dataProject.LokasiDc = o.LokasiDC;
+                    dataProject.LokasiDrc = o.LokasiDRC;
+                    dataProject.EstimasiBiayaCapex = Convert.ToInt32(o.EstimasiBiayaCapex);
+                    dataProject.EstimasiBiayaOpex = Convert.ToInt32(o.EstimasiBiayaOpex);
+                    dataProject.StatusAip = o.statusAIP;
+                    await _db.SaveChangesAsync();
+                }
+            }
+            
+            await _db.SaveChangesAsync();
+
+            return Ok(result);
         }
     }
 }
