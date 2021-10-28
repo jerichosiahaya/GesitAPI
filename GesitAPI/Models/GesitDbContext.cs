@@ -34,7 +34,7 @@ namespace GesitAPI.Models
 //            if (!optionsBuilder.IsConfigured)
 //            {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//                optionsBuilder.UseSqlServer("Server=35.219.8.90;Initial Catalog=GesitDb;Persist Security Info=True;User ID=sa;Password=bni46SQL");
+//                optionsBuilder.UseSqlServer("Server=35.219.8.90;Initial Catalog=GesitDb;Persist Security Info=True;User ID=sa;Password=bni46SQL;");
 //            }
 //        }
 
@@ -193,9 +193,13 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("jenis_dokumen");
 
-                entity.Property(e => e.TaksId)
+                entity.Property(e => e.NamaFile).HasColumnName("nama_file");
+
+                entity.Property(e => e.Tahun).HasColumnName("tahun");
+
+                entity.Property(e => e.TaskId)
                     .HasMaxLength(255)
-                    .HasColumnName("taks_id");
+                    .HasColumnName("task_id");
 
                 entity.Property(e => e.UrlDownloadFile)
                     .HasColumnType("text")
@@ -240,7 +244,9 @@ namespace GesitAPI.Models
                     .HasMaxLength(255)
                     .HasColumnName("jenis_pengembangan");
 
-                entity.Property(e => e.Lob).HasColumnName("lob");
+                entity.Property(e => e.Lob)
+                    .HasMaxLength(255)
+                    .HasColumnName("lob");
 
                 entity.Property(e => e.LokasiDc)
                     .HasMaxLength(255)

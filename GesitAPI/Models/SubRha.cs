@@ -20,11 +20,11 @@ namespace GesitAPI.Models
         public string UicBaru { get; set; }
         public string NamaAudit { get; set; }
         public string Lokasi { get; set; }
-        public int Nomor { get; set; }
+        public int? Nomor { get; set; }
         public string Masalah { get; set; }
         public string Pendapat { get; set; }
         public string Status { get; set; }
-        public int JatuhTempo { get; set; }
+        public int? JatuhTempo { get; set; }
         public int? TahunTemuan { get; set; }
         public string Assign { get; set; }
         public DateTime? CreatedAt { get; set; }

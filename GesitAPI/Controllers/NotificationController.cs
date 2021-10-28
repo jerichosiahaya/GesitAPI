@@ -13,13 +13,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static GesitAPI.Dtos.NotificationDto;
+using static GesitAPI.Dtos.ProgoDocumentDto;
 using static GesitAPI.Dtos.ProgoProjectDto;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -166,15 +167,19 @@ namespace GesitAPI.Controllers
             var request = new RestRequest("progodev/api/project?kategori=RBB");
             request.AddHeader("progo-key", apiKey);
             var response = client.Execute(request);
-            var result = JsonConvert.DeserializeObject<Root>(response.Content);
+            var result = JsonConvert.DeserializeObject<RootProgoProject>(response.Content);
             if (result.data.Count <= 0)
                 return NoContent();
-            
+
+            var dateTimeNow = DateTime.Now;
+
             foreach (var o in result.data)
             {
                 ProgoProject progoProject = new ProgoProject();
+                
                 // check the aip id
                 var countCheckAIP = _db.ProgoProjects.Where(p => p.AipId == o.AIPId).Count();
+                
                 // insert if empty
                 if (countCheckAIP == 0)
                 {
@@ -188,7 +193,7 @@ namespace GesitAPI.Controllers
                     progoProject.Durasi = Convert.ToInt32(o.Durasi);
                     progoProject.EksImplementasi = o.EksImplementasi;
                     progoProject.Divisi = o.Divisi;
-                    //progoProject.Lob = o.LOB;
+                    progoProject.Lob = o.LOB;
                     progoProject.NamaLob = o.NamaLOB;
                     progoProject.Squad = o.Squad;
                     progoProject.NamaSquad = o.NamaSquad;
@@ -205,7 +210,10 @@ namespace GesitAPI.Controllers
                     progoProject.EstimasiBiayaOpex = Convert.ToInt32(o.EstimasiBiayaOpex);
                     progoProject.StatusAip = o.statusAIP;
                     _db.ProgoProjects.Add(progoProject);
-                } else if (countCheckAIP == 1) { // update if exists
+                }
+                // update if exists
+                else if (countCheckAIP == 1) 
+                { 
                     var dataProject = _db.ProgoProjects.Where(p => p.AipId == o.AIPId).FirstOrDefault();
                     dataProject.NamaAip = o.NamaAIP;
                     dataProject.ProjectId = o.ProjectId;
@@ -216,7 +224,7 @@ namespace GesitAPI.Controllers
                     dataProject.Durasi = Convert.ToInt32(o.Durasi);
                     dataProject.EksImplementasi = o.EksImplementasi;
                     dataProject.Divisi = o.Divisi;
-                    //dataProject.Lob = o.LOB;
+                    dataProject.Lob = o.LOB;
                     dataProject.NamaLob = o.NamaLOB;
                     dataProject.Squad = o.Squad;
                     dataProject.NamaSquad = o.NamaSquad;
@@ -234,11 +242,45 @@ namespace GesitAPI.Controllers
                     dataProject.StatusAip = o.statusAIP;
                     await _db.SaveChangesAsync();
                 }
+
+                // get progo documents
+                var requestDocuments = new RestRequest("progodev/api/dokumen?AIPId=" + o.AIPId + "-" + dateTimeNow.Year);
+                requestDocuments.AddHeader("progo-key", apiKey);
+                var responseDocuments = client.Execute(requestDocuments);
+                var resultDocuments = JsonConvert.DeserializeObject<RootProgoDocument>(responseDocuments.Content);
+
+                if (resultDocuments.data.Count > 0)
+                {
+                    foreach (var i in resultDocuments.data)
+                    {
+                        ProgoDocument progoDocument = new ProgoDocument();
+
+                        // check file name first
+                        var countCheckFileName = _db.ProgoDocuments.Where(p => p.NamaFile.Equals(i.NamaFile)).Count();
+
+                        if (countCheckFileName == 0)
+                        {
+                            progoDocument.AipId = o.AIPId;
+                            progoDocument.JenisDokumen = i.JenisDokumen;
+                            progoDocument.TaskId = i.TaskId;
+                            progoDocument.Tahun = dateTimeNow.Year;
+                            progoDocument.NamaFile = i.NamaFile;
+                            progoDocument.UrlDownloadFile = i.UrlDownloadFile;
+                            _db.ProgoDocuments.Add(progoDocument);
+                        }                      
+                    }
+                }
             }
-            
             await _db.SaveChangesAsync();
 
-            return Ok(result);
+            // comparing to notification table
+            var dataNotification = _db.Notifications.ToList();
+            foreach (var p in dataNotification)
+            {
+                var checkOnProgoDocument = _db.ProgoProjects.Where(k => k.AipId == p.ProjectId); // ON PROGRESSSSSSSSSSSSSS
+            }
+
+            return Ok();
         }
     }
 }

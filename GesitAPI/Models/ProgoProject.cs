@@ -22,7 +22,7 @@ namespace GesitAPI.Models
         public int? Durasi { get; set; }
         public string EksImplementasi { get; set; }
         public string Divisi { get; set; }
-        public int? Lob { get; set; }
+        public string Lob { get; set; }
         public string NamaLob { get; set; }
         public string Squad { get; set; }
         public string NamaSquad { get; set; }

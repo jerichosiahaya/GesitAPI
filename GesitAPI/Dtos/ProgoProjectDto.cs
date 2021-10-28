@@ -7,7 +7,7 @@ namespace GesitAPI.Dtos
 {
     public class ProgoProjectDto
     {
-        public class Root
+        public class RootProgoProject
         {
             public List<MappingProject> data { get; set; }
         }
