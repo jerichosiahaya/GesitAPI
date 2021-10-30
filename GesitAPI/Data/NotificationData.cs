@@ -20,6 +20,12 @@ namespace GesitAPI.Data
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<Notification>> GetActive()
+        {
+            var result = await _db.Notifications.Where(p=>p.Status == 0).OrderBy(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            return result;
+        }
+
         public async Task<IEnumerable<Notification>> GetAll()
         {
             var result = await _db.Notifications.OrderBy(s => s.CreatedAt).AsNoTracking().ToListAsync();
@@ -29,6 +35,12 @@ namespace GesitAPI.Data
         public async Task<Notification> GetById(string id)
         {
             var result = await _db.Notifications.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotActive()
+        {
+            var result = await _db.Notifications.Where(p => p.Status == 1).OrderBy(s => s.CreatedAt).AsNoTracking().ToListAsync();
             return result;
         }
 

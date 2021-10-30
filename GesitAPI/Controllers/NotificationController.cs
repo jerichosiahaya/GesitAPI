@@ -69,6 +69,56 @@ namespace GesitAPI.Controllers
             return Ok(resultData);
         }
 
+        [HttpGet(nameof(GetActive))]
+        public async Task<IActionResult> GetActive()
+        {
+
+            List<NotificationView> resultData = new List<NotificationView>();
+            NotificationView tempData = new NotificationView();
+            var result = await _notification.GetActive();
+
+            foreach (var o in result)
+            {
+                resultData.Add(new NotificationView
+                {
+                    Id = o.Id,
+                    ProjectCategory = o.ProjectCategory,
+                    ProjectDocument = o.ProjectDocument,
+                    ProjectId = o.ProjectId,
+                    ProjectTitle = o.ProjectTitle,
+                    Status = o.Status,
+                    TargetDate = o.TargetDate.ToString("yyyy-MM-dd")
+                });
+            }
+
+            return Ok(resultData);
+        }
+
+        [HttpGet(nameof(GetNotActive))]
+        public async Task<IActionResult> GetNotActive()
+        {
+
+            List<NotificationView> resultData = new List<NotificationView>();
+            NotificationView tempData = new NotificationView();
+            var result = await _notification.GetNotActive();
+
+            foreach (var o in result)
+            {
+                resultData.Add(new NotificationView
+                {
+                    Id = o.Id,
+                    ProjectCategory = o.ProjectCategory,
+                    ProjectDocument = o.ProjectDocument,
+                    ProjectId = o.ProjectId,
+                    ProjectTitle = o.ProjectTitle,
+                    Status = o.Status,
+                    TargetDate = o.TargetDate.ToString("yyyy-MM-dd")
+                });
+            }
+
+            return Ok(resultData);
+        }
+
         // GET api/<NotificationsController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
@@ -274,13 +324,264 @@ namespace GesitAPI.Controllers
             await _db.SaveChangesAsync();
 
             // comparing to notification table
-            var dataNotification = _db.Notifications.ToList();
+            var dataNotification = _db.Notifications.Where(o => o.Status == 0).ToList();
             foreach (var p in dataNotification)
             {
-                var checkOnProgoDocument = _db.ProgoProjects.Where(k => k.AipId == p.ProjectId); // ON PROGRESSSSSSSSSSSSSS
+                if (p.ProjectDocument.Equals("Requirement"))
+                {
+                    var checkReq = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Memo Requirement") && o.AipId == p.ProjectId).Count();
+                    if (checkReq >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Cost & Benefit Analysis"))
+                {
+                    var checkCost = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Cost & Benefit  Analysis") && o.AipId == p.ProjectId).Count();
+                    if (checkCost >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Severity Sistem"))
+                {
+                    var checkSev = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Severity Sistem") && o.AipId == p.ProjectId).Count();
+                    if (checkSev >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Bussiness Impact Analysis"))
+                {
+                    var checkBus = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Bussiness Impact Analysis") && o.AipId == p.ProjectId).Count();
+                    if (checkBus >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Izin / Lapor Regulator"))
+                {
+                    var checkKajian = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Kajian untuk ijin/lapor regulatori") && o.AipId == p.ProjectId).Count();
+                    if (checkKajian >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Budgeting Capex / Opex"))
+                {
+                    var checkAnggaran = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Anggaran atau Ijin Prinsip (Capex/Opex)") && o.AipId == p.ProjectId).Count();
+                    if (checkAnggaran >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Arsitektur / Topologi"))
+                {
+                    var checkArsi = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Arsitektur atau topologi(AAD)") && o.AipId == p.ProjectId).Count();
+                    if (checkArsi >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Risk"))
+                {
+                    var checkRisk = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Asement Risk ") && o.AipId == p.ProjectId).Count();
+                    if (checkRisk >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Target Implementasi"))
+                {
+                    var checkTarget = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.EksImplementasi).FirstOrDefault();
+                    if (checkTarget != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Kategori Project"))
+                {
+                    var checkProject = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.ProjectCategory).FirstOrDefault();
+                    if (checkProject != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Sistem / App Impact"))
+                {
+                    var checkAppTerdampak = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.AplikasiTerdampak).FirstOrDefault();
+                    if (checkAppTerdampak != "" || checkAppTerdampak != null)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Pengadaan / In House"))
+                {
+                    var checkPengadaan = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.Pengembang).FirstOrDefault();
+                    if (checkPengadaan != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("New / Enhance"))
+                {
+                    var checkNewEnhance = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.JenisPengembangan).FirstOrDefault();
+                    if (checkNewEnhance != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
             }
-
+            await _db.SaveChangesAsync();
             return Ok();
         }
+
+        [HttpGet(nameof(UpdateStatus))]
+        public async Task<IActionResult> UpdateStatus()
+        {
+            var dataNotification = _db.Notifications.Where(o => o.Status == 0).ToList();
+            foreach (var p in dataNotification)
+            {
+                if (p.ProjectDocument.Equals("Requirement"))
+                {
+                    var checkReq = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Memo Requirement") && o.AipId == p.ProjectId).Count();
+                    if (checkReq >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Cost & Benefit Analysis"))
+                {
+                    var checkCost = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Cost & Benefit  Analysis") && o.AipId == p.ProjectId).Count();
+                    if (checkCost >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Severity Sistem"))
+                {
+                    var checkSev = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Severity Sistem") && o.AipId == p.ProjectId).Count();
+                    if (checkSev >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Bussiness Impact Analysis"))
+                {
+                    var checkBus = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Bussiness Impact Analysis") && o.AipId == p.ProjectId).Count();
+                    if (checkBus >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Izin / Lapor Regulator"))
+                {
+                    var checkKajian = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Kajian untuk ijin/lapor regulatori") && o.AipId == p.ProjectId).Count();
+                    if (checkKajian >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Budgeting Capex / Opex"))
+                {
+                    var checkAnggaran = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Anggaran atau Ijin Prinsip (Capex/Opex)") && o.AipId == p.ProjectId).Count();
+                    if (checkAnggaran >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Arsitektur / Topologi"))
+                {
+                    var checkArsi = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Arsitektur atau topologi(AAD)") && o.AipId == p.ProjectId).Count();
+                    if (checkArsi >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Risk"))
+                {
+                    var checkRisk = _db.ProgoDocuments.Where(o => o.JenisDokumen.Equals("Asement Risk ") && o.AipId == p.ProjectId).Count();
+                    if (checkRisk >= 1)
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Target Implementasi"))
+                {
+                    var checkTarget = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.EksImplementasi).FirstOrDefault();
+                    if (checkTarget != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Kategori Project"))
+                {
+                    var checkProject = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.ProjectCategory).FirstOrDefault();
+                    if (checkProject != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Sistem / App Impact"))
+                {
+                    var checkAppTerdampak = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.AplikasiTerdampak).FirstOrDefault();
+                    if (checkAppTerdampak != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("Pengadaan / In House"))
+                {
+                    var checkPengadaan = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.Pengembang).FirstOrDefault();
+                    if (checkPengadaan != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+                else if (p.ProjectDocument.Equals("New / Enhance"))
+                {
+                    var checkNewEnhance = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.JenisPengembangan).FirstOrDefault();
+                    if (checkNewEnhance != "")
+                    {
+                        p.Status = 1;
+                    }
+                }
+            }
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpGet(nameof(DebugTest))]
+        public IActionResult DebugTest()
+        {
+            var checkAppTerdampak = _db.ProgoProjects.Where(o => o.AipId == "SO21F112PDM").Select(o => o.AplikasiTerdampak).FirstOrDefault();
+            return Ok(checkAppTerdampak.ToString());
+                
+        }
+
     }
 }
+
+//kalo dari api dokumen yang kita ambil
+//- Memo Requirement --> Requirement
+
+//- Cost and efficiency Benefit Analysis --> Cost & Benefit Analysis
+
+//- Severity Sistem
+
+//- Bussiness Impact Analysis
+
+//- Kajian untuk ijin/lapor regulatori --> Izin / Lapor Regulator
+
+//- Anggaran atau Ijin Prinsip (Capex/Opex) --> Budgeting Capex / Opex
+
+//- Arsitektur atau topologi(AAD) --> Artistektur / Topologi
+
+//- Asement Risk -- > Risk
+
+// yang dari project
+// eksImplementasi
+// projectCategory
+// aplikasiTerdampak
+// pengembang
+// jenisPengembangan
