@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,18 +24,20 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class SubRhaImageController : ControllerBase
     {
+        private readonly IConfiguration _config;
         private IWebHostEnvironment _hostingEnvironment;
         private GesitDbContext _db;
         private ISubRha _subRha;
         private IRha _rha;
         private readonly ISubRhaImage _subRhaImage;
-        public SubRhaImageController(GesitDbContext db, ISubRha subRha, IRha rha, ISubRhaImage subRhaImage, IWebHostEnvironment hostingEnvironment)
+        public SubRhaImageController(GesitDbContext db, ISubRha subRha, IRha rha, ISubRhaImage subRhaImage, IWebHostEnvironment hostingEnvironment, IConfiguration config)
         {
             _db = db;
             _subRha = subRha;
             _rha = rha;
             _subRhaImage = subRhaImage;
             _hostingEnvironment = hostingEnvironment;
+            _config = config;
         }
 
         List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" };
@@ -47,8 +50,8 @@ namespace GesitAPI.Controllers
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "SubRhaImages";
             var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
-            string webPath = "http://35.219.8.90:90/";
-            var viewLInk = webPath + "api/SubRhaImage/GetById/";
+            string webPath = _config.GetValue<string>("ServerSettings:Gesit");
+            var viewLink = webPath + "api/SubRhaImage/GetById/";
             Directory.CreateDirectory(target);
             try
             {
@@ -112,7 +115,7 @@ namespace GesitAPI.Controllers
                     responseData.FileSize = image.Length;
                     responseData.FileType = image.ContentType;
                     responseData.CreatedAt = DateTime.Now;
-                    responseData.ViewImage = viewLInk + subRhaImage.Id;
+                    responseData.ViewImage = viewLink + subRhaImage.Id;
 
                     return Ok(new { status = "Success", message = "File successfully uploaded", data = responseData, duplicated_filenames = arrDuplicatedNames.ToList() });
                 }
@@ -133,7 +136,7 @@ namespace GesitAPI.Controllers
                     responseData.FileSize = image.Length;
                     responseData.FileType = image.ContentType;
                     responseData.CreatedAt = DateTime.Now;
-                    responseData.ViewImage = viewLInk + subRhaImage.Id;
+                    responseData.ViewImage = viewLink + subRhaImage.Id;
 
                     return Ok(new { status = "Success", message = "File successfully uploaded", data = responseData, logtime = DateTime.Now });
                 }
@@ -187,8 +190,8 @@ namespace GesitAPI.Controllers
         {
             var results = await _subRhaImage.GetAll();
             List<SubRhaImageDto> resultsData = new List<SubRhaImageDto>();
-            string webPath = "http://35.219.8.90:90/";
-            var viewLInk = webPath + "api/SubRhaImage/GetById/";
+            string webPath = _config.GetValue<string>("ServerSettings:Progo:Url");
+            var viewLink = webPath + "api/SubRhaImage/GetById/";
             foreach (var o in results)
             {
                 resultsData.Add(new SubRhaImageDto
@@ -198,7 +201,7 @@ namespace GesitAPI.Controllers
                     FileType = o.FileType,
                     FileSize = o.FileSize,
                     CreatedAt = o.CreatedAt,
-                    ViewImage = viewLInk + o.Id
+                    ViewImage = viewLink + o.Id
                 });
             }
             return Ok(resultsData);

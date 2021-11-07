@@ -37,4 +37,14 @@ namespace GesitAPI.Dtos
         }
 
     }
+
+    public class ResponseStatusRha
+    {
+        public int CountRha { get; set; }
+        public int CompletedRha { get; set; }
+        public int UncompleteRha { get; set; }
+        public float PercentageCompletedRha { get; set; }
+        public float PercentageUncompleteRha { get; set; }
+    }
+
 }

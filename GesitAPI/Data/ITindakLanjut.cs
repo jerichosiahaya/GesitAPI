@@ -8,7 +8,7 @@ namespace GesitAPI.Data
 {
     public interface ITindakLanjut : ICrud<TindakLanjut>
     {
-        Task<IEnumerable<TindakLanjut>> GetByRhaID(string idRha);
+        Task<IEnumerable<TindakLanjut>> GetBySubRhaID(string idRha);
         Task<IEnumerable<TindakLanjut>> CountExistingFileNameTindakLanjut(string filename);
     }
 }

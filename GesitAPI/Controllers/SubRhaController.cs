@@ -39,9 +39,8 @@ namespace GesitAPI.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "JPG", "JPEG", "PNG" };
+        List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "xlsx", "JPG", "JPEG", "PNG", "XLSX" };
 
-        // GET: api/<SubRhaController>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -49,7 +48,6 @@ namespace GesitAPI.Controllers
             return Ok(new { count = results.Count(), data = results });
         }
 
-        // GET api/<SubRhaController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -76,9 +74,6 @@ namespace GesitAPI.Controllers
             return Ok(new { data = results });
         }
 
-        // TO DO
-        // PERBAIKI DTO SUBRHAEVIDENCES DAN TINDAKLANJUTS
-        // GET sub rha by rha id and assign
         [HttpGet("GetByRhaIDandAssign/{rhaId}/{assign}")]
         public async Task<IActionResult> GetByRhaIDandAssign(string rhaId, string assign)
         {
@@ -155,7 +150,7 @@ namespace GesitAPI.Controllers
                         });
                     }
                     vData.TindakLanjutEvidences = vDataList;
-                    
+
                     tempData.TindakLanjuts.Add(vData);
                 }
 
@@ -165,38 +160,8 @@ namespace GesitAPI.Controllers
             return Ok(resultData);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Put([FromBody] SubRhaDto subrha)
-        {
-            try
-            {
-                SubRha updateData = new SubRha();
-                updateData.DivisiBaru = subrha.DivisiBaru;
-                updateData.UicLama = subrha.UicLama;
-                updateData.UicBaru = subrha.UicBaru;
-                updateData.NamaAudit = subrha.NamaAudit;
-                updateData.Lokasi = subrha.Lokasi;
-                updateData.Nomor = subrha.Nomor;
-                updateData.Masalah = subrha.Masalah;
-                updateData.Pendapat = subrha.Pendapat;
-                updateData.Status = subrha.Status;
-                updateData.JatuhTempo = subrha.JatuhTempo;
-                updateData.TahunTemuan = subrha.TahunTemuan;
-                updateData.Assign = subrha.Assign;
-                updateData.UsulClose = subrha.UsulClose;
-                updateData.OpenClose = subrha.OpenClose;
-                await _subRha.Update(subrha.Id.ToString(), updateData);
-                return Ok($"Data {subrha.Id} berhasil diupdate!");
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
-        }
-
-        // POST Upload Excel
-        // TO DO jatuh_tempo, fix duplicated file names
+        // DEPRECATED
+        [Obsolete]
         [HttpPost(nameof(Upload))]
         public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] int rhaId)
         {
@@ -290,18 +255,18 @@ namespace GesitAPI.Controllers
 
                                 if (obj.Rows[i][5].ToString() != "")
                                     rha.Nomor = Convert.ToInt32(obj.Rows[i][5]);
-                                    
+
                                 rha.Masalah = obj.Rows[i][6].ToString();
                                 rha.Pendapat = obj.Rows[i][7].ToString();
                                 rha.Status = obj.Rows[i][8].ToString();
 
                                 if (obj.Rows[i][9].ToString() != "")
                                     rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
-                                    
+
                                 if (obj.Rows[i][10].ToString() != "")
                                     rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
-                                    
-                                
+
+
                                 //rha.OpenClose = obj.Rows[i][11].ToString();
                                 rha.Assign = obj.Rows[i][11].ToString();
                                 rha.RhaId = rhaId;
@@ -339,6 +304,36 @@ namespace GesitAPI.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] SubRhaDto subrha)
+        {
+            try
+            {
+                SubRha updateData = new SubRha();
+                updateData.DivisiBaru = subrha.DivisiBaru;
+                updateData.UicLama = subrha.UicLama;
+                updateData.UicBaru = subrha.UicBaru;
+                updateData.NamaAudit = subrha.NamaAudit;
+                updateData.Lokasi = subrha.Lokasi;
+                updateData.Nomor = subrha.Nomor;
+                updateData.Masalah = subrha.Masalah;
+                updateData.Pendapat = subrha.Pendapat;
+                updateData.Status = subrha.Status;
+                updateData.JatuhTempo = subrha.JatuhTempo;
+                updateData.TahunTemuan = subrha.TahunTemuan;
+                updateData.Assign = subrha.Assign;
+                updateData.UsulClose = subrha.UsulClose;
+                updateData.OpenClose = subrha.OpenClose;
+                await _subRha.Update(subrha.Id.ToString(), updateData);
+                return Ok($"Data {subrha.Id} berhasil diupdate!");
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         [HttpPut("UpdateUsulClose/{id}")]
         public async Task<IActionResult> UpdateUsulClose(string id, string usulClose)
         {
@@ -368,10 +363,13 @@ namespace GesitAPI.Controllers
             }
         }
 
+        // HIDDEN CONTROLLER BELOW
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut(nameof(UpdateStatusJatuhTempo))]
         public async Task<IActionResult> UpdateStatusJatuhTempo()
         {
-            try {
+            try
+            {
                 var subRhaGetAll = await _subRha.GetAllTracking();
                 var dateNow = DateTime.Today.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
                 int compareDate = 0;
@@ -391,7 +389,7 @@ namespace GesitAPI.Controllers
                     else
                     {
                         o.StatusJatuhTempo = "Sudah Jatuh Tempo";
-                    }  
+                    }
                 }
                 await _db.SaveChangesAsync();
                 return Ok();
@@ -406,6 +404,7 @@ namespace GesitAPI.Controllers
             }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut(nameof(UpdateStatusJatuhTempoBySubRha))]
         public async Task<IActionResult> UpdateStatusJatuhTempoBySubRha(int SubRhaId)
         {
@@ -434,5 +433,363 @@ namespace GesitAPI.Controllers
 
             return Ok();
         }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpPost(nameof(UploadWithRha))]
+        public async Task<IActionResult> UploadWithRha([Required] IFormFile file, [FromForm] RhaDto rhafile)
+        {
+            var subDirectory = "UploadedFiles";
+            var subDirectory2 = "Rha";
+            var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
+            Directory.CreateDirectory(target);
+
+
+            if (file.Length <= 0)
+            {
+                return BadRequest(new { status = "Error", message = "File is empty" });
+            }
+            else if (file.Length > 10000000)
+            {
+                return BadRequest(new { status = "Error", message = "Maximum file upload exceeded" });
+            }
+
+            string s = file.FileName;
+            int checkLastIndex = s.LastIndexOf('.');
+            string lhs = checkLastIndex < 0 ? s : s.Substring(0, checkLastIndex), rhs = checkLastIndex < 0 ? "" : s.Substring(checkLastIndex + 1);
+            if (!allowedFileExtensions.Any(a => a.Equals(rhs)))
+            {
+                return BadRequest(new { status = "Error", message = $"File with extension {rhs} is not allowed", logtime = DateTime.Now });
+            }
+            var filePath = Path.Combine(target, file.FileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                // query for duplicate names to generate counter
+                var duplicateNames = await _rha.CountExistingFileNameRha(lhs); // using DI from data access layer
+                var countDuplicateNames = duplicateNames.Count();
+                var value = countDuplicateNames + 1;
+
+                // getting duplicated name into array
+                var listduplicateNames = duplicateNames.ToList();
+                List<string> arrDuplicatedNames = new List<string>();
+                listduplicateNames.ForEach(file =>
+                {
+                    var dupNames = file.FileName;
+                    arrDuplicatedNames.Add(dupNames);
+                });
+
+                // generating new file name
+                var newfileName = String.Format("{0}({1}){2}", Path.GetFileNameWithoutExtension(filePath), value, Path.GetExtension(filePath));
+                var newFilePath = Path.Combine(target, newfileName);
+
+                Rha insertData = new Rha();
+                insertData.FileType = file.ContentType;
+                insertData.FileSize = file.Length;
+                insertData.FileName = newfileName;
+                insertData.FilePath = newFilePath;
+                insertData.Kondisi = rhafile.Kondisi;
+                insertData.Rekomendasi = rhafile.Rekomendasi;
+                insertData.StatusJt = rhafile.StatusJt;
+                insertData.StatusTemuan = rhafile.StatusTemuan;
+                insertData.SubKondisi = rhafile.SubKondisi;
+                insertData.TargetDate = rhafile.TargetDate;
+                insertData.Uic = rhafile.Uic;
+                insertData.Assign = rhafile.Assign;
+                insertData.CreatedBy = rhafile.CreatedBy;
+                insertData.DirSekor = rhafile.DirSekor;
+
+                using (var stream = new FileStream(newFilePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    await _rha.Insert(insertData);
+                    await _db.SaveChangesAsync();
+                }
+
+                // insert subrha
+                int rhaId = insertData.Id;
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                using (var stream = System.IO.File.Open(newFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var conf = new ExcelDataSetConfiguration
+                        {
+                            UseColumnDataType = true,
+                            ConfigureDataTable = _ => new ExcelDataTableConfiguration
+                            {
+                                UseHeaderRow = true
+                            }
+                        };
+
+                        var result = reader.AsDataSet(conf);
+
+                        if (result != null)
+                        {
+                            try
+                            {
+                                DataTable obj = result.Tables[0];
+                                var sheetName = obj.TableName;
+                                var objCount = obj.Rows.Count;
+                                var colCount = obj.Columns.Count;
+
+                                // sementara di-comment karena ada hidden di file excel
+                                // handling error
+                                //if (colCount != 12)
+                                //    return BadRequest(new { status = false, message = "You're not using the correct template" });
+
+                                // check RHA first
+                                var checkRHA = await _rha.GetById(rhaId.ToString());
+                                if (checkRHA == null)
+                                {
+                                    await _rha.Delete(rhaId.ToString());
+                                    await _db.SaveChangesAsync();
+                                    return BadRequest(new { status = false, message = "No Rha found" });
+                                }
+                                else
+                                {
+                                    var jatuhTempoRHA = checkRHA.StatusJt;
+                                    float compareDate = 0;
+                                    List<SubRha> dataResponse = new List<SubRha>();
+                                    for (int i = 0; i < objCount; i++)
+                                    {
+
+                                        // compare date
+                                        var dateNow = DateTime.Today.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        string tglOnSubRHA = obj.Rows[i][9].ToString();
+                                        string mergedTglandJthTempo = tglOnSubRHA + " " + jatuhTempoRHA;
+                                        DateTime d1 = DateTime.ParseExact(dateNow, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        DateTime d2 = DateTime.ParseExact(mergedTglandJthTempo, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        compareDate = DateTime.Compare(d1, d2);
+
+                                        // generate Jatuh Tempo
+                                        var rha = new SubRha();
+                                        if (compareDate < 0)
+                                        {
+                                            rha.StatusJatuhTempo = "Belum Jatuh Tempo";
+                                        }
+                                        else
+                                        {
+                                            rha.StatusJatuhTempo = "Sudah Jatuh Tempo";
+                                        }
+
+                                        rha.UicLama = obj.Rows[i][0].ToString();
+                                        rha.DivisiBaru = obj.Rows[i][1].ToString();
+                                        rha.UicBaru = obj.Rows[i][2].ToString();
+                                        rha.NamaAudit = obj.Rows[i][3].ToString();
+                                        rha.Lokasi = obj.Rows[i][4].ToString();
+
+                                        if (obj.Rows[i][5].ToString() != "")
+                                            rha.Nomor = Convert.ToInt32(obj.Rows[i][5]);
+
+                                        rha.Masalah = obj.Rows[i][6].ToString();
+                                        rha.Pendapat = obj.Rows[i][7].ToString();
+                                        rha.Status = obj.Rows[i][8].ToString();
+
+                                        if (obj.Rows[i][9].ToString() != "")
+                                            rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
+
+                                        if (obj.Rows[i][10].ToString() != "")
+                                            rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
+
+
+                                        //rha.OpenClose = obj.Rows[i][11].ToString();
+                                        rha.Assign = obj.Rows[i][11].ToString();
+                                        rha.RhaId = rhaId;
+                                        rha.CreatedAt = DateTime.Now;
+                                        rha.UpdatedAt = DateTime.Now;
+                                        rha.OpenClose = "Open"; // auto open
+                                        dataResponse.Add(rha);
+                                        _db.SubRhas.Add(rha);
+
+                                    }
+                                    await _db.SaveChangesAsync();
+
+                                    // automapper
+                                    var config = new MapperConfiguration(cfg =>
+                                    cfg.CreateMap<SubRha, SubRhaDto>()
+                                    );
+                                    var mapper = new Mapper(config);
+                                    List<SubRhaDto> resultData = mapper.Map<List<SubRha>, List<SubRhaDto>>(dataResponse);
+                                }
+                            }
+                            catch (DbUpdateException dbEx)
+                            {
+                                await _rha.Delete(rhaId.ToString());
+                                await _db.SaveChangesAsync();
+                                throw new Exception(dbEx.Message);
+                            }
+                            catch (Exception ex)
+                            {
+                                await _rha.Delete(rhaId.ToString());
+                                await _db.SaveChangesAsync();
+                                return BadRequest(ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            return NotFound();
+                        }
+                    }
+                }
+                return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+            }
+            else
+            {
+                // TO DO 
+                // using AutoMapper
+                Rha insertData = new Rha();
+                insertData.FileType = file.ContentType;
+                insertData.FileSize = file.Length;
+                insertData.FileName = file.FileName;
+                insertData.FilePath = filePath;
+                insertData.Kondisi = rhafile.Kondisi;
+                insertData.Rekomendasi = rhafile.Rekomendasi;
+                insertData.StatusJt = rhafile.StatusJt;
+                insertData.StatusTemuan = rhafile.StatusTemuan;
+                insertData.SubKondisi = rhafile.SubKondisi;
+                insertData.TargetDate = rhafile.TargetDate;
+                insertData.Uic = rhafile.Uic;
+                insertData.DirSekor = rhafile.DirSekor;
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    await _rha.Insert(insertData);
+                    await _db.SaveChangesAsync();
+                }
+
+                int rhaId = insertData.Id;
+                // insert subrha
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                using (var stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var conf = new ExcelDataSetConfiguration
+                        {
+                            UseColumnDataType = true,
+                            ConfigureDataTable = _ => new ExcelDataTableConfiguration
+                            {
+                                UseHeaderRow = true
+                            }
+                        };
+
+                        var result = reader.AsDataSet(conf);
+
+                        if (result != null)
+                        {
+                            try
+                            {
+                                DataTable obj = result.Tables[0];
+                                var sheetName = obj.TableName;
+                                var objCount = obj.Rows.Count;
+                                var colCount = obj.Columns.Count;
+
+                                // sementara di-comment karena ada hidden di file excel
+                                // handling error
+                                //if (colCount != 12)
+                                //    return BadRequest(new { status = false, message = "You're not using the correct template" });
+
+                                // check RHA first
+                                var checkRHA = await _rha.GetById(rhaId.ToString());
+
+                                // to do hapus if statement
+
+                                var jatuhTempoRHA = checkRHA.StatusJt;
+                                float compareDate = 0;
+                                List<SubRha> dataResponse = new List<SubRha>();
+                                for (int i = 0; i < objCount; i++)
+                                {
+                                    if (Convert.ToInt32(obj.Rows[i][9]) <= 0)
+                                    {
+                                        await _rha.Delete(rhaId.ToString());
+                                        await _db.SaveChangesAsync();
+                                        return BadRequest(new { status = false, message = "Invalid date time" });
+                                    }
+                                    else
+                                    {
+                                        // compare date
+                                        var dateNow = DateTime.Today.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        string tglOnSubRHA = obj.Rows[i][9].ToString();
+                                        string mergedTglandJthTempo = tglOnSubRHA + " " + jatuhTempoRHA;
+                                        DateTime d1 = DateTime.ParseExact(dateNow, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        DateTime d2 = DateTime.ParseExact(mergedTglandJthTempo, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                                        compareDate = DateTime.Compare(d1, d2);
+
+                                        // generate Jatuh Tempo
+                                        var rha = new SubRha();
+                                        if (compareDate < 0)
+                                        {
+                                            rha.StatusJatuhTempo = "Belum Jatuh Tempo";
+                                        }
+                                        else
+                                        {
+                                            rha.StatusJatuhTempo = "Sudah Jatuh Tempo";
+                                        }
+
+                                        rha.UicLama = obj.Rows[i][0].ToString();
+                                        rha.DivisiBaru = obj.Rows[i][1].ToString();
+                                        rha.UicBaru = obj.Rows[i][2].ToString();
+                                        rha.NamaAudit = obj.Rows[i][3].ToString();
+                                        rha.Lokasi = obj.Rows[i][4].ToString();
+
+                                        if (obj.Rows[i][5].ToString() != "")
+                                            rha.Nomor = Convert.ToInt32(obj.Rows[i][5]);
+
+                                        rha.Masalah = obj.Rows[i][6].ToString();
+                                        rha.Pendapat = obj.Rows[i][7].ToString();
+                                        rha.Status = obj.Rows[i][8].ToString();
+
+                                        if (obj.Rows[i][9].ToString() != "")
+                                            rha.JatuhTempo = Convert.ToInt32(obj.Rows[i][9]);
+
+                                        if (obj.Rows[i][10].ToString() != "")
+                                            rha.TahunTemuan = Convert.ToInt32(obj.Rows[i][10]);
+
+
+                                        //rha.OpenClose = obj.Rows[i][11].ToString();
+                                        rha.Assign = obj.Rows[i][11].ToString();
+                                        rha.RhaId = rhaId;
+                                        rha.CreatedAt = DateTime.Now;
+                                        rha.UpdatedAt = DateTime.Now;
+                                        rha.OpenClose = "Open"; // auto open
+                                        dataResponse.Add(rha);
+                                        _db.SubRhas.Add(rha);
+                                    }
+                                }
+                                await _db.SaveChangesAsync();
+
+                                // automapper
+                                var config = new MapperConfiguration(cfg =>
+                                cfg.CreateMap<SubRha, SubRhaDto>()
+                                );
+                                var mapper = new Mapper(config);
+                                List<SubRhaDto> resultData = mapper.Map<List<SubRha>, List<SubRhaDto>>(dataResponse);
+                            }
+                            catch (DbUpdateException dbEx)
+                            {
+                                await _rha.Delete(rhaId.ToString());
+                                await _db.SaveChangesAsync();
+                                throw new Exception(dbEx.Message);
+                            }
+                            catch (Exception ex)
+                            {
+                                await _rha.Delete(rhaId.ToString());
+                                await _db.SaveChangesAsync();
+                                return BadRequest(ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            await _rha.Delete(rhaId.ToString());
+                            await _db.SaveChangesAsync();
+                            return NotFound();
+                        }
+                    }
+                }
+                return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
+            }
+        }
+
     }
 }

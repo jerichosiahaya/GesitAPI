@@ -38,11 +38,6 @@ namespace GesitAPI.Data
             return result;
         }
 
-        public Task<IEnumerable<TindakLanjut>> GetByRhaID(string idRha)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<TindakLanjut>> GetBySubRhaID(string idRha)
         {
             var result = await _db.TindakLanjuts.OrderByDescending(s => s.CreatedAt).Where(s => s.SubRhaId == Convert.ToInt32(idRha)).AsNoTracking().ToListAsync();

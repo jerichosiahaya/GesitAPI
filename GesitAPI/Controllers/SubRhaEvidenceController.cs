@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,14 +23,16 @@ namespace GesitAPI.Controllers
     [ApiController]
     public class SubRhaEvidenceController : ControllerBase
     {
+        private readonly IConfiguration _config;
         private IWebHostEnvironment _hostingEnvironment;
         private ISubRhaEvidence _subRhaEvidence;
         private GesitDbContext _db;
-        public SubRhaEvidenceController(GesitDbContext db, ISubRhaEvidence subRhaEvidence, IWebHostEnvironment hostingEnvironment)
+        public SubRhaEvidenceController(GesitDbContext db, ISubRhaEvidence subRhaEvidence, IWebHostEnvironment hostingEnvironment, IConfiguration config)
         {
             _db = db;
             _subRhaEvidence = subRhaEvidence;
             _hostingEnvironment = hostingEnvironment;
+            _config = config;
         }
 
         List<string> allowedFileExtensions = new List<string>() { "jpg", "jpeg", "png", "doc", "docx", "xls",
@@ -39,7 +42,7 @@ namespace GesitAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            string webPath = "http://35.219.8.90:90/";
+            string webPath = _config.GetValue<string>("ServerSettings:Gesit");
             var downloadLink = webPath + "api/SubRhaEvidence/DownloadFile?subRhaId=";
             var results = await _subRhaEvidence.GetAll();
             List<SubRhaEvidenceDto> subRhaData = new List<SubRhaEvidenceDto>();
@@ -59,6 +62,7 @@ namespace GesitAPI.Controllers
             return Ok(new { count = results.Count(), data = subRhaData });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpGet(nameof(DownloadFile))]
         public async Task<IActionResult> DownloadFile(int subRhaId)

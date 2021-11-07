@@ -97,6 +97,8 @@ namespace GesitAPI.Controllers
                 tlEvidence.FileType = file.ContentType;
                 tlEvidence.FileSize = file.Length;
                 tlEvidence.TindaklanjutId = tindakLanjutID;
+                tlEvidence.CreatedAt = DateTime.Now;
+                tlEvidence.UpdatedAt = DateTime.Now;
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -149,17 +151,24 @@ namespace GesitAPI.Controllers
             }
         }
 
+        [HttpGet("Download/{id}")]
+        public async Task<IActionResult> DownloadSingleFile(int id)
+        {
+            var results = await _tindakLanjutEvidence.GetById(id.ToString());
+            if (results == null)
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
 
-        //// PUT api/<TindakLanjutEvidenceController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<TindakLanjutEvidenceController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+            var path = results.FilePath;
+            var fileName = results.FileName;
+            var fileType = results.FileType;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            byte[] arr = memory.ToArray();
+            memory.Position = 0;
+            return File(memory, fileType, fileName);
+        }
     }
 }

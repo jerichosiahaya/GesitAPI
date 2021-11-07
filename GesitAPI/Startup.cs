@@ -127,7 +127,6 @@ namespace GesitAPI
             services.AddScoped<ITindakLanjutEvidence, TindakLanjutEvidenceData>();
             services.AddScoped<ISubRhaImage, SubRhaImageData>();
             services.AddScoped<INotification, NotificationData>();
-            services.AddScoped<IUser, UserData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

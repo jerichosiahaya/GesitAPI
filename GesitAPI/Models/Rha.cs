@@ -7,6 +7,11 @@ namespace GesitAPI.Models
 {
     public partial class Rha
     {
+        public Rha()
+        {
+            SubRhas = new HashSet<SubRha>();
+        }
+
         public int Id { get; set; }
         public string SubKondisi { get; set; }
         public string Kondisi { get; set; }
@@ -24,6 +29,7 @@ namespace GesitAPI.Models
         public string DirSekor { get; set; }
         public string Uic { get; set; }
         public string StatusTemuan { get; set; }
+
         public virtual ICollection<SubRha> SubRhas { get; set; }
     }
 }

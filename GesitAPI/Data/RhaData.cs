@@ -43,6 +43,33 @@ namespace GesitAPI.Data
             }
         }
 
+        public async Task DeleteAll(string id)
+        {
+            var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id))
+                .Include(c => c.SubRhas).ThenInclude(b => b.SubRhaevidences)
+                .Include(c => c.SubRhas).ThenInclude(b => b.SubRhaimages)
+                .Include(c => c.SubRhas).ThenInclude(b => b.TindakLanjuts).ThenInclude(p=>p.TindakLanjutEvidences)
+                .FirstOrDefaultAsync();
+
+            if (result != null)
+            {
+                try
+                {
+                    _db.Rhas.Remove(result);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+
+                    throw new Exception($"DbError: {dbEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error: {ex.Message}");
+                }
+            }
+        }
+
         public async Task<IEnumerable<Rha>> GetAll()
         {
             var result = await _db.Rhas.Include(e => e.SubRhas).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();

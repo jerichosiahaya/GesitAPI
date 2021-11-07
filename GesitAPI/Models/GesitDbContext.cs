@@ -17,7 +17,6 @@ namespace GesitAPI.Models
         {
         }
 
-        public virtual DbSet<Checklist> Checklists { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<ProgoDocument> ProgoDocuments { get; set; }
         public virtual DbSet<ProgoProject> ProgoProjects { get; set; }
@@ -27,7 +26,6 @@ namespace GesitAPI.Models
         public virtual DbSet<SubRhaimage> SubRhaimages { get; set; }
         public virtual DbSet<TindakLanjut> TindakLanjuts { get; set; }
         public virtual DbSet<TindakLanjutEvidence> TindakLanjutEvidences { get; set; }
-        public virtual DbSet<User> Users { get; set; }
 
 //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 //        {
@@ -41,95 +39,6 @@ namespace GesitAPI.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
-
-            modelBuilder.Entity<Checklist>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("Checklist");
-
-                entity.Property(e => e.AipId)
-                    .IsRequired()
-                    .HasMaxLength(1)
-                    .HasColumnName("aip_id");
-
-                entity.Property(e => e.CapexOpex)
-                    .HasColumnType("text")
-                    .HasColumnName("capex_opex");
-
-                entity.Property(e => e.CostBenefitAnalysis)
-                    .HasColumnType("text")
-                    .HasColumnName("cost_benefit_analysis");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.Id)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("id");
-
-                entity.Property(e => e.IzinRegulator)
-                    .HasColumnType("text")
-                    .HasColumnName("izin_regulator");
-
-                entity.Property(e => e.KategoriProject)
-                    .HasMaxLength(150)
-                    .HasColumnName("kategori_project");
-
-                entity.Property(e => e.NamaAip)
-                    .IsRequired()
-                    .HasColumnType("text")
-                    .HasColumnName("nama_aip");
-
-                entity.Property(e => e.NewEnhance)
-                    .HasMaxLength(150)
-                    .HasColumnName("new_enhance");
-
-                entity.Property(e => e.PengadaanInhouse)
-                    .HasMaxLength(150)
-                    .HasColumnName("pengadaan_inhouse");
-
-                entity.Property(e => e.ProjectCategory)
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnName("project_category");
-
-                entity.Property(e => e.ProjectId).HasColumnName("project_id");
-
-                entity.Property(e => e.ProjectTitle)
-                    .IsRequired()
-                    .HasColumnType("text")
-                    .HasColumnName("project_title");
-
-                entity.Property(e => e.Requirement)
-                    .HasColumnType("text")
-                    .HasColumnName("requirement");
-
-                entity.Property(e => e.Risk)
-                    .HasColumnType("text")
-                    .HasColumnName("risk");
-
-                entity.Property(e => e.Severity)
-                    .HasColumnType("text")
-                    .HasColumnName("severity");
-
-                entity.Property(e => e.SeveritySystem)
-                    .HasColumnType("text")
-                    .HasColumnName("severity_system");
-
-                entity.Property(e => e.SystemImpact)
-                    .HasColumnType("text")
-                    .HasColumnName("system_impact");
-
-                entity.Property(e => e.TargetImplementasi)
-                    .HasMaxLength(150)
-                    .HasColumnName("target_implementasi");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
-            });
 
             modelBuilder.Entity<Notification>(entity =>
             {
@@ -451,6 +360,12 @@ namespace GesitAPI.Models
                 entity.Property(e => e.UsulClose)
                     .HasColumnType("text")
                     .HasColumnName("usul_close");
+
+                entity.HasOne(d => d.Rha)
+                    .WithMany(p => p.SubRhas)
+                    .HasForeignKey(d => d.RhaId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_SubRHA_RHA");
             });
 
             modelBuilder.Entity<SubRhaevidence>(entity =>
@@ -617,57 +532,6 @@ namespace GesitAPI.Models
                     .WithMany(p => p.TindakLanjutEvidences)
                     .HasForeignKey(d => d.TindaklanjutId)
                     .HasConstraintName("FK__TindakLan__tinda__69FBBC1F");
-            });
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.HasKey(e => e.Npp)
-                    .HasName("PK__User__DF90E5D6663EDFC5");
-
-                entity.ToTable("User");
-
-                entity.Property(e => e.Npp)
-                    .HasMaxLength(255)
-                    .HasColumnName("npp");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at");
-
-                entity.Property(e => e.Division)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("division");
-
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("email");
-
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("first_name");
-
-                entity.Property(e => e.IsActive).HasColumnName("is_active");
-
-                entity.Property(e => e.LastName)
-                    .HasMaxLength(255)
-                    .HasColumnName("last_name");
-
-                entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("password");
-
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnName("role");
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("updated_at");
             });
 
             OnModelCreatingPartial(modelBuilder);

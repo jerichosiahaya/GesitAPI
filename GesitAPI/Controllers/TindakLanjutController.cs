@@ -150,8 +150,6 @@ namespace GesitAPI.Controllers
             var path = results.FilePath;
             var fileName = results.FileName;
             var fileType = results.FileType;
-            //byte[] arr = File.ReadAllBytes(fileName);
-            //var files = Directory.GetFiles(path);
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
             {
@@ -160,15 +158,13 @@ namespace GesitAPI.Controllers
             byte[] arr = memory.ToArray();
             memory.Position = 0;
             return File(memory, fileType, fileName);
-            //return Ok(new { data = results });
-            //return File.ReadAllBytes(fileName);
         }
 
         [HttpGet("DownloadMultiple/{rhaId}")]
         public async Task<IActionResult> GetBundleFiles(string rhaId)
         {
             List<byte[]> filesPath = new List<byte[]>();
-            var results = await _tindakLanjut.GetByRhaID(rhaId);
+            var results = await _tindakLanjut.GetBySubRhaID(rhaId);
             var files = results.ToList();
             if (files.Count == 0)
                 return Ok(new { status = "null", message = "Empty data" });

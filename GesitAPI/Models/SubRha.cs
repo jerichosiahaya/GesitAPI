@@ -34,6 +34,7 @@ namespace GesitAPI.Models
         public string UsulClose { get; set; }
         public string StatusJatuhTempo { get; set; }
 
+        public virtual Rha Rha { get; set; }
         public virtual ICollection<SubRhaevidence> SubRhaevidences { get; set; }
         public virtual ICollection<SubRhaimage> SubRhaimages { get; set; }
         public virtual ICollection<TindakLanjut> TindakLanjuts { get; set; }

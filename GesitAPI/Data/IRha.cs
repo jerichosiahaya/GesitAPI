@@ -10,5 +10,6 @@ namespace GesitAPI.Data
     {
         Task<IEnumerable<Rha>> CountExistingFileNameRha(string filename);
         IEnumerable<Rha> GetSubRHAByAssign(string assign);
+        Task DeleteAll(string id);
     }
 }

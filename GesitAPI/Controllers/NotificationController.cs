@@ -20,7 +20,7 @@ using static GesitAPI.Dtos.ProgoProjectDto;
 
 namespace GesitAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -205,7 +205,10 @@ namespace GesitAPI.Controllers
             }
         }
 
+        // HIDDEN CONTROLLER BELOW (MOVE TO CONSOLE APP)
+
         // PROGO UPDATE
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet(nameof(UpdateStatusNotification))]
         public async Task<IActionResult> UpdateStatusNotification()
         {
@@ -410,7 +413,10 @@ namespace GesitAPI.Controllers
                 else if (p.ProjectDocument.Equals("Sistem / App Impact"))
                 {
                     var checkAppTerdampak = _db.ProgoProjects.Where(o => o.AipId == p.ProjectId).Select(o => o.AplikasiTerdampak).FirstOrDefault();
-                    if (checkAppTerdampak != "" || checkAppTerdampak != null)
+                    if (checkAppTerdampak == "")
+                    {
+                        p.Status = 0;
+                    } else
                     {
                         p.Status = 1;
                     }
@@ -436,6 +442,7 @@ namespace GesitAPI.Controllers
             return Ok();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet(nameof(UpdateStatus))]
         public async Task<IActionResult> UpdateStatus()
         {
@@ -550,15 +557,6 @@ namespace GesitAPI.Controllers
             await _db.SaveChangesAsync();
             return Ok();
         }
-
-        [HttpGet(nameof(DebugTest))]
-        public IActionResult DebugTest()
-        {
-            var checkAppTerdampak = _db.ProgoProjects.Where(o => o.AipId == "SO21F112PDM").Select(o => o.AplikasiTerdampak).FirstOrDefault();
-            return Ok(checkAppTerdampak.ToString());
-                
-        }
-
     }
 }
 
