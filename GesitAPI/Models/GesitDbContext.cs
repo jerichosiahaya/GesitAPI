@@ -289,6 +289,10 @@ namespace GesitAPI.Models
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("updated_at");
+
+                entity.HasMany(e => e.SubRhas)
+                .WithOne(e => e.Rha).HasForeignKey(e => e.RhaId).OnDelete(DeleteBehavior.Cascade);
+
             });
 
             modelBuilder.Entity<SubRha>(entity =>
@@ -364,7 +368,7 @@ namespace GesitAPI.Models
                 entity.HasOne(d => d.Rha)
                     .WithMany(p => p.SubRhas)
                     .HasForeignKey(d => d.RhaId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_SubRHA_RHA");
             });
 
@@ -448,6 +452,7 @@ namespace GesitAPI.Models
                 entity.HasOne(d => d.SubRha)
                     .WithMany(p => p.SubRhaimages)
                     .HasForeignKey(d => d.SubRhaId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__SubRHAIma__sub_r__09746778");
             });
 
@@ -531,6 +536,7 @@ namespace GesitAPI.Models
                 entity.HasOne(d => d.Tindaklanjut)
                     .WithMany(p => p.TindakLanjutEvidences)
                     .HasForeignKey(d => d.TindaklanjutId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__TindakLan__tinda__69FBBC1F");
             });
 

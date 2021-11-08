@@ -46,9 +46,6 @@ namespace GesitAPI.Data
         public async Task DeleteAll(string id)
         {
             var result = await _db.Rhas.Where(s => s.Id == Convert.ToInt32(id))
-                .Include(c => c.SubRhas).ThenInclude(b => b.SubRhaevidences)
-                .Include(c => c.SubRhas).ThenInclude(b => b.SubRhaimages)
-                .Include(c => c.SubRhas).ThenInclude(b => b.TindakLanjuts).ThenInclude(p=>p.TindakLanjutEvidences)
                 .FirstOrDefaultAsync();
 
             if (result != null)

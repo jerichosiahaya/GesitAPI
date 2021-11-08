@@ -159,7 +159,7 @@ namespace GesitAPI.Controllers
             var checkCount = check.Count();
             if (checkCount == 0)
             {
-                return NoContent();
+                return BadRequest(new { status = "Fail", message = "Libur nih, gak ada kerjaan.."});
             } else
             {
 
@@ -413,7 +413,8 @@ namespace GesitAPI.Controllers
 
                         var result = reader.AsDataSet(conf);
 
-                        if (result != null)
+                        // check if documents is null
+                        if (result.Tables[0].Rows.Count > 0)
                         {
                             try
                             {
@@ -506,22 +507,25 @@ namespace GesitAPI.Controllers
                             {
                                 await _rha.Delete(rhaId.ToString());
                                 await _db.SaveChangesAsync();
-                                throw new Exception(dbEx.Message);
+                                return BadRequest(new { status = "Error", message = dbEx.Message, logtime = DateTime.Now });
                             }
                             catch (Exception ex)
                             {
                                 await _rha.Delete(rhaId.ToString());
                                 await _db.SaveChangesAsync();
-                                return BadRequest(ex.Message);
+                                return BadRequest(new { status = "Error", message = ex.Message, logtime = DateTime.Now });
                             }
+                            return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
                         }
                         else
                         {
-                            return NotFound();
+                            await _rha.Delete(rhaId.ToString());
+                            await _db.SaveChangesAsync();
+                            return NotFound(new { status = "Fail", message = "Document is empty" });
                         }
                     }
                 }
-                return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
+                //return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_name = newfileName, file_size = file.Length, file_path = newFilePath, logtime = DateTime.Now, duplicated_filenames = arrDuplicatedNames.ToList() });
             }
             else
             {
@@ -566,7 +570,8 @@ namespace GesitAPI.Controllers
 
                         var result = reader.AsDataSet(conf);
 
-                        if (result != null)
+                        // check if the document is empty
+                        if (result.Tables[0].Rows.Count > 0)
                         {
                             try
                             {
@@ -582,8 +587,6 @@ namespace GesitAPI.Controllers
 
                                 // check RHA first
                                 var checkRHA = await _rha.GetById(rhaId.ToString());
-
-                                // to do hapus if statement
 
                                 var jatuhTempoRHA = checkRHA.StatusJt;
                                 float compareDate = 0;
@@ -660,24 +663,25 @@ namespace GesitAPI.Controllers
                             {
                                 await _rha.Delete(rhaId.ToString());
                                 await _db.SaveChangesAsync();
-                                throw new Exception(dbEx.Message);
+                                return BadRequest(new { status = "Error", message = dbEx.Message, logtime = DateTime.Now });
                             }
                             catch (Exception ex)
                             {
                                 await _rha.Delete(rhaId.ToString());
                                 await _db.SaveChangesAsync();
-                                return BadRequest(ex.Message);
+                                return BadRequest(new { status = "Error", message = ex.Message, logtime = DateTime.Now });
                             }
+                            return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
                         }
                         else
                         {
                             await _rha.Delete(rhaId.ToString());
                             await _db.SaveChangesAsync();
-                            return NotFound();
+                            return NotFound(new { status = "Fail", message = "Document is empty"});
                         }
                     }
                 }
-                return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
+                //return Ok(new { status = "Success", message = "File successfully uploaded", id = insertData.Id, file_size = file.Length, file_path = filePath, logtime = DateTime.Now });
             }
         }
 

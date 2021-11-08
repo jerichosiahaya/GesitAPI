@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -15,6 +16,7 @@ namespace GesitAPI.Models
         }
 
         public int Id { get; set; }
+        [ForeignKey("Rha")]
         public int RhaId { get; set; }
         public string DivisiBaru { get; set; }
         public string UicBaru { get; set; }
