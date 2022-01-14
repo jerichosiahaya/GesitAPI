@@ -90,7 +90,7 @@ namespace GesitAPI.Data
             //                           .ToListAsync();
 
             var result = _db.Rhas.SelectMany(r => r.SubRhas, (r, s) => new { r = r, s = s })
-                             .Where(temp0 => (temp0.s.Assign == assign))
+                             .Where(temp0 => (temp0.s.Assign == assign) && temp0.s.OpenClose == "Open")
                              .Select(temp0 => temp0.r)
                              .Distinct();
 

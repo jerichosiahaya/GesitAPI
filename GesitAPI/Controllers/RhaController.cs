@@ -159,7 +159,7 @@ namespace GesitAPI.Controllers
             var checkCount = check.Count();
             if (checkCount == 0)
             {
-                return BadRequest(new { status = "Fail", message = "Libur nih, gak ada kerjaan.."});
+                return BadRequest(new { status = "Fail", message = "There is no data have been found"});
             } else
             {
 
@@ -321,7 +321,6 @@ namespace GesitAPI.Controllers
                 await _rha.DeleteAll(id.ToString());
                 return Ok(new { status = true, message = $"Successfully delete the RHA file with id: {id}" });
             }
-               
         }
 
         // upload rha with subrha

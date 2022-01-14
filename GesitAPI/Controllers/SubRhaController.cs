@@ -160,8 +160,7 @@ namespace GesitAPI.Controllers
             return Ok(resultData);
         }
 
-        // DEPRECATED
-        [Obsolete]
+        // insert sub rha from excel file
         [HttpPost(nameof(Upload))]
         public async Task<IActionResult> Upload([Required] IFormFile file, [FromForm] int rhaId)
         {
@@ -304,6 +303,64 @@ namespace GesitAPI.Controllers
             }
         }
 
+        // insert sub rha from form
+        [HttpPost(nameof(SingleUpload))]
+        public async Task<IActionResult> SingleUpload([Required][FromForm] SubRhaInsert subRhaInsert)
+        {
+            int rhaId = subRhaInsert.RhaId;
+            // check rha id first
+            var checkRHA = await _rha.GetById(rhaId.ToString());
+            if (checkRHA != null)
+            {
+                var jatuhTempoRHA = checkRHA.StatusJt;
+                
+                // compare date
+                var dateNow = DateTime.Today.ToString("d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                string tglOnSubRHA = subRhaInsert.JatuhTempo.ToString();
+                string mergedTglandJthTempo = tglOnSubRHA + " " + jatuhTempoRHA;
+                DateTime d1 = DateTime.ParseExact(dateNow, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                DateTime d2 = DateTime.ParseExact(mergedTglandJthTempo, "d MMMM yyyy", new System.Globalization.CultureInfo("id-ID"));
+                float compareDate = DateTime.Compare(d1, d2);
+
+                
+                SubRha subRha = new SubRha();
+
+                // generate Jatuh Tempo
+                if (compareDate < 0)
+                {
+                    subRha.StatusJatuhTempo = "Belum Jatuh Tempo";
+                }
+                else
+                {
+                    subRha.StatusJatuhTempo = "Sudah Jatuh Tempo";
+                }
+
+                subRha.JatuhTempo = subRhaInsert.JatuhTempo;
+                subRha.Lokasi = subRhaInsert.Lokasi;
+                subRha.Masalah = subRhaInsert.Masalah;
+                subRha.NamaAudit = subRhaInsert.NamaAudit;
+                subRha.Nomor = subRhaInsert.Nomor;
+                subRha.OpenClose = "Open";
+                subRha.Pendapat = subRhaInsert.Pendapat;
+                subRha.RhaId = rhaId;
+                subRha.DivisiBaru = subRhaInsert.DivisiBaru;
+                subRha.UicLama = subRhaInsert.UicLama;
+                subRha.UicBaru = subRhaInsert.UicBaru;
+                subRha.Status = subRhaInsert.Status;
+                subRha.TahunTemuan = subRhaInsert.TahunTemuan;
+                subRha.Assign = subRhaInsert.Assign;
+                subRha.CreatedAt = DateTime.Now;
+                subRha.UpdatedAt = DateTime.Now;
+                await _subRha.Insert(subRha);
+
+                return Ok(new { status = "Success", data = subRhaInsert});
+            } 
+            else
+            {
+                return BadRequest(new { status = "Error", message = $"There is no RHA with id: {rhaId}" });
+            }
+        }
+
         [HttpPut]
         public async Task<IActionResult> Put([FromBody] SubRhaDto subrha)
         {
@@ -360,6 +417,22 @@ namespace GesitAPI.Controllers
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        // delete sub rha
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var results = await _subRha.GetById(id);
+            if (results == null)
+            {
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
+            }
+            else
+            {
+                await _subRha.Delete(id.ToString());
+                return Ok(new { status = true, message = $"Successfully delete the RHA file with id: {id}" });
             }
         }
 

@@ -23,10 +23,26 @@ namespace GesitAPI.Data
             throw new NotImplementedException();
         }
 
-        // TBC
-        public Task Delete(string id)
+        public async Task Delete(string id)
         {
-            throw new NotImplementedException();
+            var result = await GetById(id);
+            if (result != null)
+            {
+                try
+                {
+                    _db.SubRhas.Remove(result);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+
+                    throw new Exception($"DbError: {dbEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error: {ex.Message}");
+                }
+            }
         }
 
         public async Task<IEnumerable<SubRha>> GetAll()
@@ -67,9 +83,21 @@ namespace GesitAPI.Data
         }
 
         // NOT NECESSARY
-        public Task Insert(SubRha obj)
+        public async Task Insert(SubRha obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _db.SubRhas.Add(obj);
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception(dbEx.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         // TBC

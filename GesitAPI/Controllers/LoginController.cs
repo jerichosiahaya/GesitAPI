@@ -147,7 +147,6 @@ namespace GesitAPI.Controllers
                     return BadRequest();
                 }
             }
-
         }
 
         private string mD5HashEncrypt(string password)
