@@ -55,7 +55,7 @@ namespace GesitAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GesitAPI", Version = "v1" });
             });
 
-            services.AddDbContext<GesitDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("ServerConnection")));
+            services.AddDbContext<GesitDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("CloudConnection")));
 
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
