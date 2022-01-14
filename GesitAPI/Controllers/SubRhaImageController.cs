@@ -50,7 +50,7 @@ namespace GesitAPI.Controllers
             var subDirectory = "UploadedFiles";
             var subDirectory2 = "SubRhaImages";
             var target = Path.Combine(_hostingEnvironment.ContentRootPath, subDirectory, subDirectory2);
-            string webPath = _config.GetValue<string>("ServerSettings:Gesit");
+            string webPath = _config.GetValue<string>("ServerSettings:GesitAzure");
             var viewLink = webPath + "api/SubRhaImage/GetById/";
             Directory.CreateDirectory(target);
             try
@@ -170,7 +170,6 @@ namespace GesitAPI.Controllers
                     CreatedAt = o.CreatedAt
                 });
             }
-
             return Ok(resultData);
         }
 
@@ -190,7 +189,7 @@ namespace GesitAPI.Controllers
         {
             var results = await _subRhaImage.GetAll();
             List<SubRhaImageDto> resultsData = new List<SubRhaImageDto>();
-            string webPath = _config.GetValue<string>("ServerSettings:Progo:Url");
+            string webPath = _config.GetValue<string>("ServerSettings:GesitAzure");
             var viewLink = webPath + "api/SubRhaImage/GetById/";
             foreach (var o in results)
             {
