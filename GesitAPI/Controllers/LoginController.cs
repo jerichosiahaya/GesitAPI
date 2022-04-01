@@ -16,6 +16,7 @@ using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
+using GesitAPI.Dtos;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -177,6 +178,51 @@ namespace GesitAPI.Controllers
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        // DUMMY LOGIN
+        public class UserPrivate
+        {
+            public int id { get; set; }
+            public string npp { get; set; }
+            public string name { get; set; }
+            public string email { get; set; }
+            public string role { get; set; }
+            public string password { get; set; }
+        }
+
+        private List<UserPrivate> _users = new List<UserPrivate>
+        {
+            new UserPrivate { id = 1, npp = "P05000", email = "amgr1@bni.com", name = "Reza Makmur", role = "AMGR", password = "dummy123" },
+            new UserPrivate { id = 2, npp = "P05001", email = "avp1@bni.com", name = "Budi Septio", role = "AVP", password = "dummy123" },
+            new UserPrivate { id = 3, npp = "P05002", email = "os1@bni.com", name = "Septi Anna", role = "OS", password = "dummy123" },
+        };
+
+        [HttpGet("LoginDummy")]
+        public IActionResult LoginDummy([Required]string npp, string password)
+        {
+            var user = _users.SingleOrDefault(x => x.npp == npp && x.password == password);
+            if (user == null)
+            {
+                return BadRequest(new { status = "Error", message = "User not found" });
+            } else
+            {
+                UserAuth userAuth = new UserAuth()
+                {
+                    NPP = user.npp
+                };
+
+                UserDto userData = new UserDto()
+                {
+                    Id = user.id,
+                    Npp = user.npp,
+                    Name = user.name,
+                    Role = user.role,
+                    Token = generateJwtToken(userAuth)
+                };
+
+                return Ok(new { status = "Success", data = userData });
+            }
         }
 
     }
