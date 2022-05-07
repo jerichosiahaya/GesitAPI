@@ -158,7 +158,7 @@ namespace GesitAPI.Controllers
                 }
 
                 var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
-                return Ok(result);
+                return Ok(json);
             } else
             {
                 var request = new RestRequest("progoproject/kategori/" + kategori);
@@ -279,10 +279,8 @@ namespace GesitAPI.Controllers
                 }
 
                 var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
-                return Ok(result);
+                return Ok(json);
             }
-
-            
             
         }
 
