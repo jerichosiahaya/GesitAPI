@@ -18,7 +18,7 @@ using static GesitAPI.Dtos.ResponseMonitoring;
 
 namespace GesitAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class MonitoringController : ControllerBase
@@ -37,126 +37,253 @@ namespace GesitAPI.Controllers
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progoproject/kategori/"+kategori);
-            request.AddHeader("x-hasura-admin-secret", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
-            var response = client.Execute(request);
-            var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
-            //var result = response.Content;
 
-            if (result.progoproject.Count <= 0)
-                return NoContent();
-            foreach (var item in result.progoproject)
+            if (kategori.Equals("All"))
             {
-                var total = 0;
-                var completedCount = 0;
-                var uncompletedCount = 0;
-                decimal percentageCompleted = 0;
-                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
+                var request = new RestRequest("progoproject/kategori");
+                request.AddHeader("x-hasura-admin-secret", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
                 {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "EstimasiBiayaCapex"
-                    && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
-
-                    uncompletedCount = total;
-                    completedCount = 9 - uncompletedCount;
-                    percentageCompleted = completedCount / 9m;
-                    item.PercentageCompleted = percentageCompleted;
-
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                     {
-                        item.StatusProject = "Completed";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
-
                 }
-                else
-                {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
-                    && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
-                    uncompletedCount = total;
-                    completedCount = 11 - uncompletedCount;
-                    percentageCompleted = completedCount / 11m;
-                    item.PercentageCompleted = percentageCompleted;
-
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                var groupByDivision = result.progoproject.Where(x => x.divisi != null)
+                    .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                     {
-                        item.StatusProject = "Completed";
+                        Division = d,
+                        Data = r.Select(x => new Project()
+                        {
+                            AIPId = x.aip_id,
+                            PercentageCompleted = x.PercentageCompleted,
+                            NamaAIP = x.nama_aip,
+                            ProjectId = x.project_id,
+                            statusAIP = x.status_aip,
+                            StatusProject = x.StatusProject
+                        }).ToList()
+                    }).ToList();
+
+                foreach (var groupItem in groupByDivision)
+                {
+                    float totalProject = groupItem.Data.Count();
+                    float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
+                    float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                    int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+                    int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+
+                    string statusAIP = groupItem.Data.Select(x => x.statusAIP).ToString();
+                    groupItem.CompletedPercentage = totalCompleted / totalProject;
+                    //groupItem.Completed = Convert.ToInt32(totalCompleted);
+                    //groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
+                    groupItem.TotalProject = Convert.ToInt32(totalProject);
+
+                    groupItem.Status.Add(new StatusInfoMonitoring()
+                    {
+                        CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                        UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                        CompletedFromProgo = totalCompletedProgo,
+                        UncompleteFromProgo = totalUncompleteProgo
+                    });
+                }
+
+                var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
+                return Ok(result);
+            } else
+            {
+                var request = new RestRequest("progoproject/kategori/" + kategori);
+                request.AddHeader("x-hasura-admin-secret", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
+                {
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
+                    {
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
-
                 }
-            }
 
-            var groupByDivision = result.progoproject.Where(x => x.divisi != null)
-                .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
-                {
-                    Division = d,
-                    Data = r.Select(x => new Project()
+                var groupByDivision = result.progoproject.Where(x => x.divisi != null)
+                    .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                     {
-                        AIPId = x.aip_id,
-                        PercentageCompleted = x.PercentageCompleted,
-                        NamaAIP = x.nama_aip,
-                        ProjectId = x.project_id,
-                        statusAIP = x.status_aip,
-                        StatusProject = x.StatusProject
-                    }).ToList()
-                }).ToList();
+                        Division = d,
+                        Data = r.Select(x => new Project()
+                        {
+                            AIPId = x.aip_id,
+                            PercentageCompleted = x.PercentageCompleted,
+                            NamaAIP = x.nama_aip,
+                            ProjectId = x.project_id,
+                            statusAIP = x.status_aip,
+                            StatusProject = x.StatusProject
+                        }).ToList()
+                    }).ToList();
 
-            foreach (var groupItem in groupByDivision)
-            {
-                float totalProject = groupItem.Data.Count();
-                float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
-                float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
-                int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
-                int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
-
-                string statusAIP = groupItem.Data.Select(x => x.statusAIP).ToString();
-                groupItem.CompletedPercentage = totalCompleted / totalProject;
-                //groupItem.Completed = Convert.ToInt32(totalCompleted);
-                //groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
-                groupItem.TotalProject = Convert.ToInt32(totalProject);
-
-                groupItem.Status.Add(new StatusInfoMonitoring()
+                foreach (var groupItem in groupByDivision)
                 {
-                    CompletedFromPercentage = Convert.ToInt32(totalCompleted),
-                    UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
-                    CompletedFromProgo = totalCompletedProgo,
-                    UncompleteFromProgo = totalUncompleteProgo
-                });
+                    float totalProject = groupItem.Data.Count();
+                    float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
+                    float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                    int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+                    int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" or "Cancel / Pending" or "RTP/Production/PIR" or "Cancel/Pending").Count(); // on check kalau ada kesalahan
+
+                    string statusAIP = groupItem.Data.Select(x => x.statusAIP).ToString();
+                    groupItem.CompletedPercentage = totalCompleted / totalProject;
+                    //groupItem.Completed = Convert.ToInt32(totalCompleted);
+                    //groupItem.Uncomplete = Convert.ToInt32(totalUncomplete);
+                    groupItem.TotalProject = Convert.ToInt32(totalProject);
+
+                    groupItem.Status.Add(new StatusInfoMonitoring()
+                    {
+                        CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                        UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                        CompletedFromProgo = totalCompletedProgo,
+                        UncompleteFromProgo = totalUncompleteProgo
+                    });
+                }
+
+                var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
+                return Ok(result);
             }
 
-            var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
-            return Ok(result);
+            
+            
         }
 
         [HttpGet("{kategori}/{divisi}")]
@@ -167,125 +294,250 @@ namespace GesitAPI.Controllers
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progoproject/kategori/"+kategori);
-            request.AddHeader("x-hasura-admin-secret", apiKey);
-            var response = client.Execute(request);
-            var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-            // var json = JsonConvert.SerializeObject(result, Formatting.Indented);
-
-            if (result.progoproject.Count <= 0)
-                return NoContent();
-            foreach (var item in result.progoproject)
+            if (kategori.Equals("All"))
             {
-                var total = 0;
-                var completedCount = 0;
-                var uncompletedCount = 0;
-                decimal percentageCompleted = 0;
-                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
+                var request = new RestRequest("progoproject/kategori");
+                request.AddHeader("x-hasura-admin-secret", apiKey);
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+
+
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
                 {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "EstimasiBiayaCapex"
-                    && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
-
-                    uncompletedCount = total;
-                    completedCount = 9 - uncompletedCount;
-                    percentageCompleted = completedCount / 9m;
-
-                    item.PercentageCompleted = percentageCompleted;
-
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                     {
-                        item.StatusProject = "Completed";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
-
                 }
-                else
-                {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
-                    && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
-                    uncompletedCount = total;
-                    completedCount = 11 - uncompletedCount;
-                    percentageCompleted = completedCount / 11m;
-
-                    item.PercentageCompleted = percentageCompleted;
-
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                var groupByDivision = result.progoproject.Where(x => x.divisi == divisi)
+                    .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                     {
-                        item.StatusProject = "Completed";
+                        Division = d,
+                        Data = r.Select(x => new Project()
+                        {
+                            AIPId = x.aip_id,
+                            PercentageCompleted = x.PercentageCompleted,
+                            NamaAIP = x.nama_aip,
+                            ProjectId = x.project_id,
+                            statusAIP = x.status_aip,
+                            StatusProject = x.StatusProject
+                        }).ToList()
+                    })
+                    .ToList();
+
+                foreach (var groupItem in groupByDivision)
+                {
+                    float totalProject = groupItem.Data.Count();
+                    float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
+                    float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                    int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending").Count(); // on check kalau ada kesalahan
+                                                                                                                                                // int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "Cancel / Pending").Count(); // on check kalau ada kesalahan
+                    int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" || x.statusAIP is not "Cancel / Pending").Count();
+
+                    groupItem.CompletedPercentage = totalCompleted / totalProject;
+                    groupItem.TotalProject = Convert.ToInt32(totalProject);
+                    groupItem.Status.Add(new StatusInfoMonitoring()
+                    {
+                        CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                        UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                        CompletedFromProgo = totalCompletedProgo,
+                        UncompleteFromProgo = Convert.ToInt32(totalProject) - totalCompletedProgo // TO DO: get count dari linq, jangan dikurang
+                    });
+                }
+                return Ok(groupByDivision);
+            } else
+            {
+                var request = new RestRequest("progoproject/kategori/" + kategori);
+                request.AddHeader("x-hasura-admin-secret", apiKey);
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+
+
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
+                {
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
+                    {
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
-
                 }
-            }
 
-            var groupByDivision = result.progoproject.Where(x => x.divisi == divisi)
-                .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
-                {
-                    Division = d,
-                    Data = r.Select(x => new Project()
+                var groupByDivision = result.progoproject.Where(x => x.divisi == divisi)
+                    .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                     {
-                        AIPId = x.aip_id,
-                        PercentageCompleted = x.PercentageCompleted,
-                        NamaAIP = x.nama_aip,
-                        ProjectId = x.project_id,
-                        statusAIP = x.status_aip,
-                        StatusProject = x.StatusProject
-                    }).ToList()
-                })
-                .ToList();
+                        Division = d,
+                        Data = r.Select(x => new Project()
+                        {
+                            AIPId = x.aip_id,
+                            PercentageCompleted = x.PercentageCompleted,
+                            NamaAIP = x.nama_aip,
+                            ProjectId = x.project_id,
+                            statusAIP = x.status_aip,
+                            StatusProject = x.StatusProject
+                        }).ToList()
+                    })
+                    .ToList();
 
-            foreach (var groupItem in groupByDivision)
-            {
-                float totalProject = groupItem.Data.Count();
-                float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
-                float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
-                int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending").Count(); // on check kalau ada kesalahan
-                // int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "Cancel / Pending").Count(); // on check kalau ada kesalahan
-                int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" || x.statusAIP is not "Cancel / Pending").Count();
-
-                groupItem.CompletedPercentage = totalCompleted / totalProject;
-                groupItem.TotalProject = Convert.ToInt32(totalProject);
-                groupItem.Status.Add(new StatusInfoMonitoring()
+                foreach (var groupItem in groupByDivision)
                 {
-                    CompletedFromPercentage = Convert.ToInt32(totalCompleted),
-                    UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
-                    CompletedFromProgo = totalCompletedProgo,
-                    UncompleteFromProgo = Convert.ToInt32(totalProject) - totalCompletedProgo // TO DO: get count dari linq, jangan dikurang
-                });
+                    float totalProject = groupItem.Data.Count();
+                    float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
+                    float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
+                    int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending").Count(); // on check kalau ada kesalahan
+                                                                                                                                                // int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "Cancel / Pending").Count(); // on check kalau ada kesalahan
+                    int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" || x.statusAIP is not "Cancel / Pending").Count();
+
+                    groupItem.CompletedPercentage = totalCompleted / totalProject;
+                    groupItem.TotalProject = Convert.ToInt32(totalProject);
+                    groupItem.Status.Add(new StatusInfoMonitoring()
+                    {
+                        CompletedFromPercentage = Convert.ToInt32(totalCompleted),
+                        UncompleteFromPercentage = Convert.ToInt32(totalUncomplete),
+                        CompletedFromProgo = totalCompletedProgo,
+                        UncompleteFromProgo = Convert.ToInt32(totalProject) - totalCompletedProgo // TO DO: get count dari linq, jangan dikurang
+                    });
+                }
+                return Ok(groupByDivision);
             }
-            return Ok(groupByDivision);
+
+            
         }
 
         [HttpGet("StatusAll/{kategori}")]
@@ -296,102 +548,206 @@ namespace GesitAPI.Controllers
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progoproject/kategori/" + kategori);
-            request.AddHeader("x-hasura-admin-secret", apiKey);
-            var response = client.Execute(request);
-            var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-            if (result.progoproject.Count <= 0)
-                return NoContent();
-            foreach (var item in result.progoproject)
+            if (kategori.Equals("All"))
             {
-                var total = 0;
-                var completedCount = 0;
-                var uncompletedCount = 0;
-                decimal percentageCompleted = 0;
-                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
+                var request = new RestRequest("progoproject/kategori");
+                request.AddHeader("x-hasura-admin-secret", apiKey);
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
                 {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "EstimasiBiayaCapex"
-                    && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
-
-                    uncompletedCount = total;
-                    completedCount = 9 - uncompletedCount;
-                    percentageCompleted = completedCount / 9m;
-                    item.PercentageCompleted = percentageCompleted;
-
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                     {
-                        item.StatusProject = "Completed";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
-
                 }
-                else
+
+                var responseData = result.progoproject.Where(x => x.divisi != null).ToList();
+                var projectCount = responseData.Count();
+                var StatusCompletedCountProgo = responseData.Where(x => x.StatusProject is "Completed").Count();
+                var StatusUncompleteCountProgo = responseData.Where(x => x.StatusProject is "Uncomplete").Count();
+                var StatusCompletedCountPercentage = responseData.Where(x => x.PercentageCompleted == 1).Count();
+                var StatusUncompleteCountPercentage = responseData.Where(x => x.PercentageCompleted < 1).Count();
+
+                ResponseMonitoringStatusAll resultStatus = new ResponseMonitoringStatusAll()
                 {
-                    total = item.GetType()
-                    .GetProperties()
-                    .Where(x => x.Name != "NamaLOB"
-                    && x.Name != "ProjectId" && x.Name != "Durasi"
-                    && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
-                    && x.Name != "Divisi" && x.Name != "LOB"
-                    && x.Name != "Squad" && x.Name != "NamaSquad"
-                    && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
-                    && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
-                    && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
-                    && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
-                    .Select(x => x.GetValue(item, null))
-                    .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
+                    ProjectCount = projectCount,
+                    CompletedCountFromProgo = StatusCompletedCountProgo,
+                    UncompleteCountFromProgo = StatusUncompleteCountProgo,
+                    CompletedCountFromPercentage = StatusCompletedCountPercentage,
+                    UncompleteCountFromPercentage = StatusUncompleteCountPercentage
+                };
 
-                    uncompletedCount = total;
-                    completedCount = 11 - uncompletedCount;
-                    percentageCompleted = completedCount / 11m;
-                    item.PercentageCompleted = percentageCompleted;
+                return Ok(resultStatus);
+            } else
+            {
+                var request = new RestRequest("progoproject/kategori/" + kategori);
+                request.AddHeader("x-hasura-admin-secret", apiKey);
+                var response = client.Execute(request);
+                var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                if (result.progoproject.Count <= 0)
+                    return NoContent();
+                foreach (var item in result.progoproject)
+                {
+                    var total = 0;
+                    var completedCount = 0;
+                    var uncompletedCount = 0;
+                    decimal percentageCompleted = 0;
+                    if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                     {
-                        item.StatusProject = "Completed";
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "EstimasiBiayaCapex"
+                        && x.Name != "EstimasiBiayaOpex" && x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)));
+
+                        uncompletedCount = total;
+                        completedCount = 9 - uncompletedCount;
+                        percentageCompleted = completedCount / 9m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
                     }
                     else
                     {
-                        item.StatusProject = "Uncomplete";
-                    }
+                        total = item.GetType()
+                        .GetProperties()
+                        .Where(x => x.Name != "NamaLOB"
+                        && x.Name != "ProjectId" && x.Name != "Durasi"
+                        && x.Name != "ProjectValue" && x.Name != "ProjectBudget"
+                        && x.Name != "Divisi" && x.Name != "LOB"
+                        && x.Name != "Squad" && x.Name != "NamaSquad"
+                        && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
+                        && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
+                        && x.Name != "status_completed" && x.Name != "AIPId"
+                        && x.Name != "StatusInfo" && x.Name != "statusAIP"
+                        && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
+                        .Select(x => x.GetValue(item, null))
+                        .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
 
+                        uncompletedCount = total;
+                        completedCount = 11 - uncompletedCount;
+                        percentageCompleted = completedCount / 11m;
+                        item.PercentageCompleted = percentageCompleted;
+
+                        if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
+                        {
+                            item.StatusProject = "Completed";
+                        }
+                        else
+                        {
+                            item.StatusProject = "Uncomplete";
+                        }
+
+                    }
                 }
+
+                var responseData = result.progoproject.Where(x => x.divisi != null).ToList();
+                var projectCount = responseData.Count();
+                var StatusCompletedCountProgo = responseData.Where(x => x.StatusProject is "Completed").Count();
+                var StatusUncompleteCountProgo = responseData.Where(x => x.StatusProject is "Uncomplete").Count();
+                var StatusCompletedCountPercentage = responseData.Where(x => x.PercentageCompleted == 1).Count();
+                var StatusUncompleteCountPercentage = responseData.Where(x => x.PercentageCompleted < 1).Count();
+
+                ResponseMonitoringStatusAll resultStatus = new ResponseMonitoringStatusAll()
+                {
+                    ProjectCount = projectCount,
+                    CompletedCountFromProgo = StatusCompletedCountProgo,
+                    UncompleteCountFromProgo = StatusUncompleteCountProgo,
+                    CompletedCountFromPercentage = StatusCompletedCountPercentage,
+                    UncompleteCountFromPercentage = StatusUncompleteCountPercentage
+                };
+
+                return Ok(resultStatus);
             }
 
-            var responseData = result.progoproject.Where(x => x.divisi != null).ToList();
-            var projectCount = responseData.Count();
-            var StatusCompletedCountProgo = responseData.Where(x => x.StatusProject is "Completed").Count();
-            var StatusUncompleteCountProgo = responseData.Where(x => x.StatusProject is "Uncomplete").Count();
-            var StatusCompletedCountPercentage = responseData.Where(x => x.PercentageCompleted == 1).Count();
-            var StatusUncompleteCountPercentage = responseData.Where(x => x.PercentageCompleted < 1).Count();
-
-            ResponseMonitoringStatusAll resultStatus = new ResponseMonitoringStatusAll()
-            {
-                ProjectCount = projectCount,
-                CompletedCountFromProgo = StatusCompletedCountProgo,
-                UncompleteCountFromProgo = StatusUncompleteCountProgo,
-                CompletedCountFromPercentage = StatusCompletedCountPercentage,
-                UncompleteCountFromPercentage = StatusUncompleteCountPercentage
-            };
-
-            return Ok(resultStatus);
+            
         }
     }
 }

@@ -44,6 +44,7 @@ namespace GesitAPI.Dtos
             public string estimasi_biaya_capex { get; set; }
             public string estimasi_biaya_opex { get; set; }
             public string status_aip { get; set; }
+            public string kategori { get; set; }
         }
     }
 }
