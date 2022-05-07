@@ -32,25 +32,26 @@ namespace GesitAPI.Controllers
         [HttpGet("{kategori}")]
         public IActionResult MonitoringGovernanceProject(string kategori)
         {
-            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
-            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+            var requestUrl = _config.GetValue<string>("ServerSettings:GesitHasura:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:GesitHasura:hasura-key");
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
+            var request = new RestRequest("progoproject/kategori/"+kategori);
+            request.AddHeader("x-hasura-admin-secret", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
+            //var result = response.Content;
 
-            if (result.data.Count <= 0)
+            if (result.progoproject.Count <= 0)
                 return NoContent();
-            foreach (var item in result.data)
+            foreach (var item in result.progoproject)
             {
                 var total = 0;
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
-                if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
+                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                 {
                     total = item.GetType()
                     .GetProperties()
@@ -72,7 +73,7 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 9m;
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -94,7 +95,7 @@ namespace GesitAPI.Controllers
                     && x.Name != "TahunCreate" && x.Name != "PeriodeAIP"
                     && x.Name != "AplikasiTerdampak" && x.Name != "LokasiDRC"
                     && x.Name != "status_completed" && x.Name != "AIPId"
-                    && x.Name != "StatusInfo" && x.Name != "statusAIP" 
+                    && x.Name != "StatusInfo" && x.Name != "statusAIP"
                     && x.Name != "PercentageCompeted" && x.Name != "StatusProject")
                     .Select(x => x.GetValue(item, null))
                     .Count(v => v is null || (v is string a && string.IsNullOrWhiteSpace(a)) || v is "0"); // delete this if capex/opex 0 is not counted as null
@@ -104,7 +105,7 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 11m;
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -116,16 +117,17 @@ namespace GesitAPI.Controllers
                 }
             }
 
-            var groupByDivision = result.data.Where(x => x.Divisi != null)
-                .GroupBy(o => o.Divisi, (d, r) => new ResponseMonitoring()
+            var groupByDivision = result.progoproject.Where(x => x.divisi != null)
+                .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                 {
                     Division = d,
-                    Data = r.Select(x => new Project() { 
-                        AIPId = x.AIPId,
+                    Data = r.Select(x => new Project()
+                    {
+                        AIPId = x.aip_id,
                         PercentageCompleted = x.PercentageCompleted,
-                        NamaAIP = x.NamaAIP,
-                        ProjectId = x.ProjectId,
-                        statusAIP = x.statusAIP,
+                        NamaAIP = x.nama_aip,
+                        ProjectId = x.project_id,
+                        statusAIP = x.status_aip,
                         StatusProject = x.StatusProject
                     }).ToList()
                 }).ToList();
@@ -154,33 +156,33 @@ namespace GesitAPI.Controllers
             }
 
             var json = JsonConvert.SerializeObject(groupByDivision, Formatting.Indented);
-            return Ok(json);
+            return Ok(result);
         }
 
         [HttpGet("{kategori}/{divisi}")]
         public IActionResult MonitoringGovernanceProjectByDivisi(string kategori, string divisi)
         {
-            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
-            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+            var requestUrl = _config.GetValue<string>("ServerSettings:GesitHasura:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:GesitHasura:hasura-key");
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", apiKey);
+            var request = new RestRequest("progoproject/kategori/"+kategori);
+            request.AddHeader("x-hasura-admin-secret", apiKey);
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-            //var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            // var json = JsonConvert.SerializeObject(result, Formatting.Indented);
 
-            if (result.data.Count <= 0)
+            if (result.progoproject.Count <= 0)
                 return NoContent();
-            foreach (var item in result.data)
+            foreach (var item in result.progoproject)
             {
                 var total = 0;
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
-                if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
+                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                 {
                     total = item.GetType()
                     .GetProperties()
@@ -203,7 +205,7 @@ namespace GesitAPI.Controllers
 
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -236,7 +238,7 @@ namespace GesitAPI.Controllers
 
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -248,20 +250,19 @@ namespace GesitAPI.Controllers
                 }
             }
 
-            var groupByDivision = result.data.Where(x => x.Divisi == divisi)
-                .GroupBy(o => o.Divisi, (d, r) => new ResponseMonitoring()
+            var groupByDivision = result.progoproject.Where(x => x.divisi == divisi)
+                .GroupBy(o => o.divisi, (d, r) => new ResponseMonitoring()
                 {
                     Division = d,
                     Data = r.Select(x => new Project()
                     {
-                        AIPId = x.AIPId,
+                        AIPId = x.aip_id,
                         PercentageCompleted = x.PercentageCompleted,
-                        NamaAIP = x.NamaAIP,
-                        ProjectId = x.ProjectId,
-                        statusAIP = x.statusAIP,
+                        NamaAIP = x.nama_aip,
+                        ProjectId = x.project_id,
+                        statusAIP = x.status_aip,
                         StatusProject = x.StatusProject
                     }).ToList()
-
                 })
                 .ToList();
 
@@ -271,7 +272,7 @@ namespace GesitAPI.Controllers
                 float totalCompleted = groupItem.Data.Where(x => x.PercentageCompleted == 1).Count();
                 float totalUncomplete = groupItem.Data.Where(x => x.PercentageCompleted < 1).Count();
                 int totalCompletedProgo = groupItem.Data.Where(x => x.statusAIP is "RTP / Production / PIR" or "Cancel / Pending").Count(); // on check kalau ada kesalahan
-                //int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "Cancel / Pending").Count(); // on check kalau ada kesalahan
+                // int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "Cancel / Pending").Count(); // on check kalau ada kesalahan
                 int totalUncompleteProgo = groupItem.Data.Where(x => x.statusAIP is not "RTP / Production / PIR" || x.statusAIP is not "Cancel / Pending").Count();
 
                 groupItem.CompletedPercentage = totalCompleted / totalProject;
@@ -284,32 +285,31 @@ namespace GesitAPI.Controllers
                     UncompleteFromProgo = Convert.ToInt32(totalProject) - totalCompletedProgo // TO DO: get count dari linq, jangan dikurang
                 });
             }
-            
             return Ok(groupByDivision);
         }
 
         [HttpGet("StatusAll/{kategori}")]
         public IActionResult StatusAll(string kategori)
         {
-            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
-            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+            var requestUrl = _config.GetValue<string>("ServerSettings:GesitHasura:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:GesitHasura:hasura-key");
 
             var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progodev/api/project?kategori=" + kategori);
-            request.AddHeader("progo-key", apiKey);
+            var request = new RestRequest("progoproject/kategori/" + kategori);
+            request.AddHeader("x-hasura-admin-secret", apiKey);
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Monitoring>(response.Content);
 
-            if (result.data.Count <= 0)
+            if (result.progoproject.Count <= 0)
                 return NoContent();
-            foreach (var item in result.data)
+            foreach (var item in result.progoproject)
             {
                 var total = 0;
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
-                if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
+                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                 {
                     total = item.GetType()
                     .GetProperties()
@@ -331,7 +331,7 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 9m;
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -363,7 +363,7 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 11m;
                     item.PercentageCompleted = percentageCompleted;
 
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         item.StatusProject = "Completed";
                     }
@@ -375,7 +375,7 @@ namespace GesitAPI.Controllers
                 }
             }
 
-            var responseData = result.data.Where(x => x.Divisi != null).ToList();
+            var responseData = result.progoproject.Where(x => x.divisi != null).ToList();
             var projectCount = responseData.Count();
             var StatusCompletedCountProgo = responseData.Where(x => x.StatusProject is "Completed").Count();
             var StatusUncompleteCountProgo = responseData.Where(x => x.StatusProject is "Uncomplete").Count();

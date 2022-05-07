@@ -220,7 +220,6 @@ namespace GesitAPI.Controllers
                     Role = user.role,
                     Token = generateJwtToken(userAuth)
                 };
-
                 return Ok(new { status = "Success", data = userData });
             }
         }

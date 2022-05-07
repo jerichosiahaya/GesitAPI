@@ -29,25 +29,25 @@ namespace GesitAPI.Controllers
         [HttpGet("{kategori}")]
         public IActionResult RPTI(string kategori)
         {
-            var requestUrl = _config.GetValue<string>("ServerSettings:Progo:Url");
-            var apiKey = _config.GetValue<string>("ServerSettings:Progo:ProgoKey");
+            var requestUrl = _config.GetValue<string>("ServerSettings:GesitHasura:Url");
+            var apiKey = _config.GetValue<string>("ServerSettings:GesitHasura:hasura-key");
 
-            var client = new RestClient("http://35.219.107.102/");
+            var client = new RestClient(requestUrl);
             client.UseNewtonsoftJson();
-            var request = new RestRequest("progodev/api/project?kategori="+kategori);
-            request.AddHeader("progo-key", "progo123");
+            var request = new RestRequest("progoproject/kategori/" + kategori);
+            request.AddHeader("x-hasura-admin-secret", apiKey); // perlu diubah kalau progo ganti nama parameter 'progo-key'
             var response = client.Execute(request);
             var result = JsonConvert.DeserializeObject<Root>(response.Content);
-            if (result.data.Count <= 0)
+            if (result.progoproject.Count <= 0)
                 return NoContent();
-            foreach (var item in result.data)
+            foreach (var item in result.progoproject)
             {
                 var total = 0;
                 var completedCount = 0;
                 var uncompletedCount = 0;
                 decimal percentageCompleted = 0;
                 string statusCompleted = null;
-                if (item.Pengembang == "Inhouse" || item.Pengembang == "InHouse")
+                if (item.pengembang == "Inhouse" || item.pengembang == "InHouse")
                 {
                     total = item.GetType()
                     .GetProperties()
@@ -99,7 +99,7 @@ namespace GesitAPI.Controllers
                     
 
                     // status complete from StatusAIP
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         statusCompleted = "Completed";
                     } else
@@ -165,7 +165,7 @@ namespace GesitAPI.Controllers
                     percentageCompleted = completedCount / 11m;
 
                     // status complete from StatusAIP
-                    if (item.statusAIP == "RTP / Production / PIR" || item.statusAIP == "Cancel / Pending" || item.statusAIP == "RTP/Production/PIR" || item.statusAIP == "Cancel/Pending")
+                    if (item.status_aip == "RTP / Production / PIR" || item.status_aip == "Cancel / Pending" || item.status_aip == "RTP/Production/PIR" || item.status_aip == "Cancel/Pending")
                     {
                         statusCompleted = "Completed";
                     }

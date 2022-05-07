@@ -9,7 +9,7 @@ namespace GesitAPI.Dtos
     {
         public class Root
         {
-            public List<MappingReporting> data { get; set; }
+            public List<MappingReporting> progoproject { get; set; }
         }
         public class StatusInfo
         {
@@ -28,32 +28,32 @@ namespace GesitAPI.Dtos
                 StatusInfo = new List<StatusInfo>();
             }
             public List<StatusInfo> StatusInfo { get; set; }
-            public string AIPId { get; set; }
-            public string NamaAIP { get; set; }
-            public string ProjectId { get; set; }
-            public string NamaProject { get; set; }
-            public string ProjectBudget { get; set; }
-            public string ProjectValue { get; set; }
-            public string StrategicImportance { get; set; }
-            public string Durasi { get; set; }
-            public string EksImplementasi { get; set; }
-            public string Divisi { get; set; }
-            public string LOB { get; set; }
-            public string NamaLOB { get; set; }
-            public string Squad { get; set; }
-            public string NamaSquad { get; set; }
-            public string TahunCreate { get; set; }
-            public string PeriodeAIP { get; set; }
-            public string AplikasiTerdampak { get; set; }
-            public string ProjectCategory { get; set; }
-            public string JenisPengembangan { get; set; }
-            public string Pengembang { get; set; }
-            public string PPJTIPihakTerkait { get; set; }
-            public string LokasiDC { get; set; }
-            public string LokasiDRC { get; set; }
-            public string EstimasiBiayaCapex { get; set; }
-            public string EstimasiBiayaOpex { get; set; }
-            public string statusAIP { get; set; }
+            public string aip_id { get; set; }
+            public string nama_aip { get; set; }
+            public string project_id { get; set; }
+            public string nama_project { get; set; }
+            public string project_budget { get; set; }
+            public string project_value { get; set; }
+            public string strategic_importance { get; set; }
+            public string durasi { get; set; }
+            public string eks_implementasi { get; set; }
+            public string divisi { get; set; }
+            public string lob { get; set; }
+            public string nama_lob { get; set; }
+            public string squad { get; set; }
+            public string nama_squad { get; set; }
+            public string tahun_create { get; set; }
+            public string periode_aip { get; set; }
+            public string aplikasi_terdampak { get; set; }
+            public string project_category { get; set; }
+            public string jenis_pengembangan { get; set; }
+            public string pengembang { get; set; }
+            public string ppjti_pihak_terkait { get; set; }
+            public string lokasi_dc { get; set; }
+            public string lokasi_drc { get; set; }
+            public string estimasi_biaya_capex { get; set; }
+            public string estimasi_biaya_opex { get; set; }
+            public string status_aip { get; set; }
         }
     }
 }
