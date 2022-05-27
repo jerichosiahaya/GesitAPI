@@ -121,6 +121,7 @@ namespace GesitAPI.Controllers
                     insertData.FilePath = filePath;
                     insertData.FileType = file.ContentType;
                     insertData.FileSize = file.Length;
+                    insertData.CreatedAt = DateTime.Now;
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);

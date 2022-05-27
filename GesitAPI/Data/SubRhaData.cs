@@ -59,7 +59,7 @@ namespace GesitAPI.Data
 
         public async Task<IEnumerable<SubRha>> GetByAssign(string assign)
         {
-            var result = await _db.SubRhas.Where(s => s.Assign == assign).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            var result = await _db.SubRhas.Where(s => s.Assign == assign).Include(e => e.TindakLanjuts).ThenInclude(o => o.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
             return result;
         }
 
