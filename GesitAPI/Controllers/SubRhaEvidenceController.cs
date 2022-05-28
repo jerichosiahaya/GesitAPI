@@ -91,6 +91,22 @@ namespace GesitAPI.Controllers
             return Ok(new { data = results });
         }
 
+        // delete subrha evidence
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var results = await _subRhaEvidence.GetById(id);
+            if (results == null)
+            {
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
+            }
+            else
+            {
+                await _subRhaEvidence.Delete(id.ToString());
+                return Ok(new { status = true, message = $"Successfully delete the tindak lanjut with id: {id}" });
+            }
+        }
+
         // download sub RHA evidence file
         [HttpGet("Download/{id}")]
         public async Task<IActionResult> DownloadSingleFile(int id)
@@ -145,6 +161,7 @@ namespace GesitAPI.Controllers
                 subRhaEvidencefile.FileSize = formFile.Length;
                 subRhaEvidencefile.Notes = notes;
                 subRhaEvidencefile.SubRhaId = subRhaId;
+                subRhaEvidencefile.CreatedAt = DateTime.Now;
 
                 if (System.IO.File.Exists(filePath))
                 {

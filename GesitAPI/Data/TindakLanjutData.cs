@@ -21,20 +21,37 @@ namespace GesitAPI.Data
         }
 
         // TBC
-        public Task Delete(string id)
+        public async Task Delete(string id)
         {
-            throw new NotImplementedException();
+            var result = await GetById(id);
+            if (result != null)
+            {
+                try
+                {
+                    _db.TindakLanjuts.Remove(result);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateException dbEx)
+                {
+
+                    throw new Exception($"DbError: {dbEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error: {ex.Message}");
+                }
+            }
         }
 
         public async Task<IEnumerable<TindakLanjut>> GetAll()
         {
-            var result = await _db.TindakLanjuts.OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
+            var result = await _db.TindakLanjuts.Include(o=>o.TindakLanjutEvidences).OrderByDescending(s => s.CreatedAt).AsNoTracking().ToListAsync();
             return result;
         }
 
         public async Task<TindakLanjut> GetById(string id)
         {
-            var result = await _db.TindakLanjuts.Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
+            var result = await _db.TindakLanjuts.Include(o=>o.TindakLanjutEvidences).Where(s => s.Id == Convert.ToInt32(id)).FirstOrDefaultAsync();
             return result;
         }
 

@@ -179,6 +179,22 @@ namespace GesitAPI.Controllers
             return DownloadMultipleFiles(filesPath);
         }
 
+        // delete tindak lanjut
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var results = await _tindakLanjut.GetById(id);
+            if (results == null)
+            {
+                return BadRequest(new { status = "Error", message = "There is no such a file" });
+            }
+            else
+            {
+                await _tindakLanjut.Delete(id.ToString());
+                return Ok(new { status = true, message = $"Successfully delete the tindak lanjut with id: {id}" });
+            }
+        }
+
         // This only a function, not controller
         private FileResult DownloadMultipleFiles(List<byte[]> byteArrayList)
         {
